@@ -1,0 +1,23 @@
+{
+  "name": "whole-brain-training",
+  "version": "1.0.0",
+  "description": "全脑训练工具网站，包含字母舒尔特、速读、闪视等训练模块",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4",
+    "pinia": "^2.1.6",
+    "localforage": "^1.10.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.4",
+    "vite": "^4.4.9"
+  },
+  "author": "",
+  "license": "MIT"
+}
