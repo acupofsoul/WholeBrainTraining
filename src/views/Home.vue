@@ -3,40 +3,30 @@
     <!-- 主横幅区域 -->
     <section class="hero-section">
       <div class="hero-background">
-        <div class="brain-network"></div>
+        <div class="hero-pattern"></div>
+        <div class="hero-gradient"></div>
       </div>
       <div class="hero-content">
         <div class="hero-text">
-          <h1 class="hero-title">
-            <span class="title-main">全脑训练</span>
-            <span class="title-sub">智能训练平台</span>
-          </h1>
-          <p class="hero-description">
-            基于科学的认知训练方法，全面提升您的大脑潜能
-          </p>
-          <div class="hero-features">
-            <div class="feature-item">
-              <span class="feature-icon">🧠</span>
-              <span>科学训练</span>
-            </div>
-            <div class="feature-item">
-              <span class="feature-icon">📊</span>
-              <span>数据追踪</span>
-            </div>
-            <div class="feature-item">
-              <span class="feature-icon">🎯</span>
-              <span>个性化</span>
-            </div>
+          <div class="hero-badge">
           </div>
+          
+          <h1 class="hero-title">
+            <span class="title-main">全脑训练工具</span>
+          </h1>
+          
+          <p class="hero-description">
+            基于认知科学研究，通过系统化的训练方法，全面提升您的
+            <span class="highlight">注意力</span>、<span class="highlight">记忆力</span>、
+            <span class="highlight">阅读速度</span>和<span class="highlight">认知能力</span>
+          </p>
+          
           <div class="hero-actions">
             <router-link to="/meditation" class="btn btn-primary">
               <span class="btn-icon">🚀</span>
-              开始训练之旅
+              立即开始训练
+              <span class="btn-arrow">→</span>
             </router-link>
-            <a href="#modules" class="btn btn-secondary">
-              <span class="btn-icon">📖</span>
-              了解更多
-            </a>
           </div>
         </div>
         <div class="hero-visual">
@@ -52,32 +42,7 @@
       </div>
     </section>
     
-    <!-- 训练统计概览 -->
-    <section class="stats-section" v-if="hasTrainingData">
-      <h2 class="section-title">您的训练概览</h2>
-      <div class="stats-container">
-        <div class="stat-card">
-          <div class="stat-icon">📊</div>
-          <div class="stat-value">{{ totalTrainingSessions }}</div>
-          <div class="stat-label">总训练次数</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">⏱️</div>
-          <div class="stat-value">{{ formatTime(totalTrainingTime) }}</div>
-          <div class="stat-label">总训练时间</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📅</div>
-          <div class="stat-value">{{ lastTrainingDate }}</div>
-          <div class="stat-label">上次训练</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">🏆</div>
-          <div class="stat-value">{{ calculateConsistency }}%</div>
-          <div class="stat-label">坚持度</div>
-        </div>
-      </div>
-    </section>
+
     
     <!-- 训练模块 -->
     <section id="modules" class="modules-section">
@@ -94,12 +59,7 @@
             <div class="module-badge">基础</div>
           </div>
           <h3 class="module-title">冥想与放松训练</h3>
-          <p class="module-description">通过冥想、脑波调节和节拍器训练，帮助您进入最佳学习状态</p>
-          <div class="module-features">
-            <span class="feature-tag">语音引导</span>
-            <span class="feature-tag">脑波发生器</span>
-            <span class="feature-tag">节拍器</span>
-          </div>
+          <p class="module-description">通过正念冥想、脑波调节和深度放松技巧，培养专注力和情绪调节能力。</p>
           <router-link to="/meditation" class="module-btn">
             <span>开始训练</span>
             <span class="btn-arrow">→</span>
@@ -113,12 +73,7 @@
             <div class="module-badge">核心</div>
           </div>
           <h3 class="module-title">基础训练</h3>
-          <p class="module-description">提升整体感知、扩大视野、培养视读节奏和流畅性</p>
-          <div class="module-features">
-            <span class="feature-tag">整体感知</span>
-            <span class="feature-tag">扩大视野</span>
-            <span class="feature-tag">舒尔特表</span>
-          </div>
+          <p class="module-description">以舒尔特表和注意力分配训练为核心，系统提升视觉搜索、注意力控制和认知处理速度。</p>
           <router-link to="/basic-training" class="module-btn">
             <span>开始训练</span>
             <span class="btn-arrow">→</span>
@@ -132,14 +87,7 @@
             <div class="module-badge">进阶</div>
           </div>
           <h3 class="module-title">闪视训练</h3>
-          <p class="module-description">通过快速闪现训练，提高视觉记忆和信息处理速度</p>
-          <div class="module-features">
-            <span class="feature-tag">基本闪视</span>
-            <span class="feature-tag">文章闪视</span>
-            <span class="feature-tag">图像闪视</span>
-            <span class="feature-tag">自定义单词</span>
-            <span class="feature-tag">自定义图片</span>
-          </div>
+          <p class="module-description">通过极短时间内的图像和文字闪现，训练瞬间记忆和快速信息处理能力。</p>
           <router-link to="/flash-training" class="module-btn">
             <span>开始训练</span>
             <span class="btn-arrow">→</span>
@@ -153,11 +101,7 @@
             <div class="module-badge">应用</div>
           </div>
           <h3 class="module-title">速读训练</h3>
-          <p class="module-description">提高阅读速度和理解力，掌握高效阅读技巧</p>
-          <div class="module-features">
-            <span class="feature-tag">文章阅读</span>
-            <span class="feature-tag">3D图阅读</span>
-          </div>
+          <p class="module-description">运用科学的速读技巧和眼动训练，在保持理解质量的前提下大幅提升阅读速度。</p>
           <router-link to="/speed-reading" class="module-btn">
             <span>开始训练</span>
             <span class="btn-arrow">→</span>
@@ -171,12 +115,7 @@
             <div class="module-badge">高级</div>
           </div>
           <h3 class="module-title">照相记忆</h3>
-          <p class="module-description">开发右脑图像记忆能力，实现快速记忆和回忆</p>
-          <div class="module-features">
-            <span class="feature-tag">残像训练</span>
-            <span class="feature-tag">颜色感知</span>
-            <span class="feature-tag">3D卡片</span>
-          </div>
+          <p class="module-description">通过视野扩展和图像记忆训练，开发右脑潜能，提升对复杂视觉信息的快速记忆和精确回忆能力。</p>
           <router-link to="/photographic-memory" class="module-btn">
             <span>开始训练</span>
             <span class="btn-arrow">→</span>
@@ -190,11 +129,7 @@
             <div class="module-badge">评估</div>
           </div>
           <h3 class="module-title">能力测评</h3>
-          <p class="module-description">全面评估您的认知能力水平，制定个性化训练计划</p>
-          <div class="module-features">
-            <span class="feature-tag">综合评估</span>
-            <span class="feature-tag">能力分析</span>
-          </div>
+          <p class="module-description">基于认知心理学理论，全面评估注意力、记忆力、处理速度等核心认知能力。</p>
           <router-link to="/abilities" class="module-btn">
             <span>开始测评</span>
             <span class="btn-arrow">→</span>
@@ -203,63 +138,101 @@
       </div>
     </section>
     
-    <!-- 最近训练记录 -->
-    <section class="recent-trainings-section" v-if="hasTrainingData">
-      <h2 class="section-title">最近训练记录</h2>
-      <div class="recent-trainings-container">
-        <div class="recent-training-list">
-          <div v-for="(training, index) in recentTrainings" :key="index" class="recent-training-item">
-            <div class="training-type" :class="getTrainingTypeClass(training.type)">
-              {{ getTrainingTypeName(training.type) }}
+    <!-- 训练效果与科学依据 -->
+    <section class="benefits-section">
+      <div class="section-header">
+        <h2 class="section-title">训练效果与科学依据</h2>
+        <p class="section-subtitle">基于认知科学研究，经过科学验证的训练方法</p>
+      </div>
+      
+      <div class="benefits-container">
+        <div class="integrated-benefits">
+          <!-- 核心效果展示 -->
+          <div class="core-benefits">
+            <div class="benefit-highlight">
+              <div class="highlight-icon">🧠</div>
+              <div class="highlight-content">
+                <h3>全面认知能力提升</h3>
+                <p>系统性认知训练显著提升工作记忆、注意力控制和信息处理速度，训练效果可迁移到日常学习和工作中。</p>
+              </div>
             </div>
-            <div class="training-details">
-              <div class="training-date">{{ formatTrainingDate(training.timestamp) }}</div>
-              <div class="training-result">{{ getTrainingResult(training) }}</div>
+            
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value">25-40%</div>
+                <div class="stat-label">注意力提升</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">2-5倍</div>
+                <div class="stat-label">阅读速度</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">30-50%</div>
+                <div class="stat-label">记忆力改善</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">6个月+</div>
+                <div class="stat-label">效果持续</div>
+              </div>
             </div>
           </div>
-          <div v-if="recentTrainings.length === 0" class="no-records">
-            暂无训练记录
+          
+          <!-- 科学依据 -->
+          <div class="scientific-evidence">
+            <h3>科学研究支持</h3>
+            <div class="evidence-list">
+               <div class="evidence-item">
+                 <span class="evidence-tag">认知心理学</span>
+                 <span class="evidence-text">工作记忆训练提升流体智力</span>
+               </div>
+               <div class="evidence-item">
+                 <span class="evidence-tag">神经科学</span>
+                 <span class="evidence-text">注意力训练增强前额叶功能</span>
+               </div>
+               <div class="evidence-item">
+                 <span class="evidence-tag">教育心理学</span>
+                 <span class="evidence-text">速读训练显著提升阅读能力</span>
+               </div>
+               <div class="evidence-item">
+                 <span class="evidence-tag">应用认知科学</span>
+                 <span class="evidence-text">多模态训练具有迁移效果</span>
+               </div>
+             </div>
           </div>
         </div>
       </div>
     </section>
     
-    <!-- 训练指南 -->
-    <section id="guide" class="guide-section">
-      <h2 class="section-title">训练指南</h2>
-      <div class="guide-container">
-        <div class="guide-card">
-          <h3>新手入门</h3>
-          <p>如果您是第一次使用全脑训练工具，建议从以下步骤开始：</p>
-          <ol>
-            <li>每天进行15-30分钟的训练</li>
-            <li>从舒尔特表3×3难度开始</li>
-            <li>速读训练从200字/分钟开始</li>
-            <li>闪视训练从简单难度开始</li>
-          </ol>
+
+    
+
+
+    <!-- 底部信息 -->
+    <footer class="footer-section">
+      <div class="footer-content">
+        <div class="footer-info">
+          <h3>全脑训练系统</h3>
+          <p>科学训练方法，提升认知能力</p>
         </div>
-        
-        <div class="guide-card">
-          <h3>推荐训练计划</h3>
-          <p>根据科学研究，以下训练计划可以有效提升认知能力：</p>
-          <ul>
-            <li><strong>周一、三、五：</strong> 舒尔特表 + 闪视训练</li>
-            <li><strong>周二、四、六：</strong> 速读训练 + 闪视训练</li>
-            <li><strong>周日：</strong> 休息或轻度训练</li>
-          </ul>
-        </div>
-        
-        <div class="guide-card">
-          <h3>进阶技巧</h3>
-          <p>当您完成基础训练后，可以尝试以下进阶方法：</p>
-          <ul>
-            <li>舒尔特表训练时尝试外周视觉，不要移动眼球</li>
-            <li>速读训练时尝试减少眼球停留次数</li>
-            <li>闪视训练时逐渐减少显示时间</li>
-          </ul>
+        <div class="footer-links">
+          <div class="link-group">
+            <h4>训练模块</h4>
+            <router-link to="/meditation">冥想训练</router-link>
+            <router-link to="/basic-training">基础训练</router-link>
+            <router-link to="/flash-training">闪视训练</router-link>
+          </div>
+          <div class="link-group">
+            <h4>更多功能</h4>
+            <router-link to="/speed-reading">速读训练</router-link>
+            <router-link to="/memory-training">记忆训练</router-link>
+            <router-link to="/abilities">能力测评</router-link>
+          </div>
         </div>
       </div>
-    </section>
+      <div class="footer-bottom">
+        <p>&copy; 2024 全脑训练系统. 专注于认知能力提升.</p>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -459,12 +432,25 @@ const getTrainingResult = (training) => {
 /* 主横幅区域样式 */
 .hero-section {
   position: relative;
-  padding: 80px 40px;
-  margin-bottom: 60px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
+  padding: 100px 40px;
+  margin-bottom: 80px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  border-radius: 30px;
   overflow: hidden;
   color: white;
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .hero-background {
@@ -473,13 +459,19 @@ const getTrainingResult = (training) => {
   left: 0;
   right: 0;
   bottom: 0;
-  opacity: 0.1;
+  opacity: 0.15;
 }
 
 .brain-network {
   width: 100%;
   height: 100%;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="brain" patternUnits="userSpaceOnUse" width="20" height="20"><circle cx="10" cy="10" r="1" fill="%23ffffff" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23brain)"/></svg>') repeat;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="brain" patternUnits="userSpaceOnUse" width="25" height="25"><circle cx="12.5" cy="12.5" r="1.5" fill="%23ffffff" opacity="0.4"/><circle cx="6" cy="6" r="0.8" fill="%23ffffff" opacity="0.2"/><circle cx="19" cy="19" r="0.8" fill="%23ffffff" opacity="0.2"/></pattern></defs><rect width="100" height="100" fill="url(%23brain)"/></svg>') repeat;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
 .hero-content {
@@ -661,26 +653,73 @@ const getTrainingResult = (training) => {
 
 /* 统计概览样式 */
 .stats-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease-in-out infinite;
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
   margin-bottom: 60px;
+}
+
+.stats-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .stats-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .stat-card {
-  background: white;
-  border-radius: 15px;
-  padding: 30px 20px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 2.5rem 1.5rem;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px) scale(1.05);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.stat-card:hover::before {
+  left: 100%;
 }
 
 .stat-icon {
@@ -690,16 +729,18 @@ const getTrainingResult = (training) => {
 }
 
 .stat-value {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: white;
   margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .stat-label {
-  color: #7f8c8d;
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
   font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 /* 训练模块样式 */
@@ -733,13 +774,13 @@ const getTrainingResult = (training) => {
 
 .module-card {
   background: white;
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  border: 2px solid transparent;
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
 .module-card::before {
@@ -748,44 +789,63 @@ const getTrainingResult = (training) => {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--module-color), var(--module-color-light));
+  height: 5px;
+  background: linear-gradient(135deg, var(--module-color), var(--module-color-light));
+  border-radius: 24px 24px 0 0;
+}
+
+.module-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--module-color), var(--module-color-light));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: 24px;
+  z-index: -1;
 }
 
 .module-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 24px 48px rgba(var(--module-color-rgb), 0.2);
   border-color: var(--module-color);
+}
+
+.module-card:hover::after {
+  opacity: 0.03;
 }
 
 .module-card.meditation {
   --module-color: #9b59b6;
-  --module-color-light: #bb7bd1;
+  --module-color-light: #c39bd3;
   --module-color-rgb: 155, 89, 182;
 }
 
 .module-card.basic {
   --module-color: #3498db;
-  --module-color-light: #5dade2;
+  --module-color-light: #85c1e9;
   --module-color-rgb: 52, 152, 219;
 }
 
 .module-card.flash {
-  --module-color: #f39c12;
-  --module-color-light: #f7c52d;
-  --module-color-rgb: 243, 156, 18;
-}
-
-.module-card.speed {
   --module-color: #e74c3c;
-  --module-color-light: #ec7063;
+  --module-color-light: #f1948a;
   --module-color-rgb: 231, 76, 60;
 }
 
+.module-card.speed {
+  --module-color: #f39c12;
+  --module-color-light: #f8c471;
+  --module-color-rgb: 243, 156, 18;
+}
+
 .module-card.memory {
-  --module-color: #1abc9c;
-  --module-color-light: #48c9b0;
-  --module-color-rgb: 26, 188, 156;
+  --module-color: #27ae60;
+  --module-color-light: #82e0aa;
+  --module-color-rgb: 39, 174, 96;
 }
 
 .module-card.assessment {
@@ -972,56 +1032,277 @@ const getTrainingResult = (training) => {
   font-style: italic;
 }
 
-/* 训练指南样式 */
-.guide-section {
+
+
+/* 训练效果与科学依据样式 */
+.benefits-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f8fafc 100%);
+  position: relative;
+  overflow: hidden;
   margin-bottom: 60px;
 }
 
-.guide-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
+.benefits-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+  pointer-events: none;
 }
 
-.guide-card {
+.benefits-container {
+  position: relative;
+  z-index: 2;
+}
+
+.integrated-benefits {
   background: white;
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.guide-card:hover {
-  transform: translateY(-5px);
+.core-benefits {
+  margin-bottom: 3rem;
 }
 
-.guide-card h3 {
-  color: #2c3e50;
-  font-size: 1.3rem;
+.benefit-highlight {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.highlight-icon {
+  font-size: 4rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  flex-shrink: 0;
+}
+
+.highlight-content h3 {
+  color: #1e293b;
+  font-size: 1.8rem;
   font-weight: 700;
-  margin-bottom: 15px;
+  margin-bottom: 0.8rem;
 }
 
-.guide-card p {
-  color: #7f8c8d;
-  line-height: 1.6;
-  margin-bottom: 20px;
+.highlight-content p {
+  color: #64748b;
+  line-height: 1.7;
+  font-size: 1.1rem;
+  margin: 0;
 }
 
-.guide-card ol,
-.guide-card ul {
-  color: #2c3e50;
-  line-height: 1.8;
-  padding-left: 20px;
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
 }
 
-.guide-card li {
-  margin-bottom: 8px;
+.stat-card {
+  text-align: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 16px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
-.guide-card strong {
-  color: #2c3e50;
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 16px;
+  padding: 2px;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.15);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #64748b;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scientific-evidence h3 {
+  color: #1e293b;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.evidence-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  /* 移动端响应式布局 */
+  @media (max-width: 768px) {
+    .evidence-list {
+      grid-template-columns: 1fr;
+    }
+  }
+
+.evidence-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 12px;
+  border-left: 4px solid #3b82f6;
+  transition: all 0.3s ease;
+}
+
+.evidence-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+}
+
+.evidence-tag {
+  font-weight: 700;
+  color: #3b82f6;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.evidence-text {
+  color: #475569;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+/* 底部信息样式 */
+.footer-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 0 20px;
+  margin-top: 80px;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.footer-info h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  background: linear-gradient(45deg, #fff, #e0e7ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footer-info p {
+  font-size: 16px;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+}
+
+.link-group h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #e0e7ff;
+}
+
+.link-group a {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  padding: 8px 0;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border-left: 2px solid transparent;
+  padding-left: 12px;
+}
+
+.link-group a:hover {
+  color: white;
+  border-left-color: #60a5fa;
+  padding-left: 16px;
+  transform: translateX(4px);
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 40px;
+  text-align: center;
+}
+
+.footer-bottom p {
+  font-size: 14px;
+  opacity: 0.7;
+  margin: 0;
 }
 
 /* 响应式设计 */
@@ -1086,11 +1367,65 @@ const getTrainingResult = (training) => {
   
   .stats-container {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
   
-  .guide-container {
-    grid-template-columns: 1fr;
+  .stat-card {
+    padding: 1.5rem 1rem;
   }
+  
+  .stat-icon {
+    font-size: 2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.8rem;
+  }
+  
+  .stat-label {
+    font-size: 0.85rem;
+  }
+  
+  /* 训练效果部分响应式 */
+  .benefits-section {
+    padding: 3rem 0;
+  }
+  
+  .benefits-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .benefit-card {
+    padding: 1.5rem;
+  }
+  
+  .benefit-icon {
+    font-size: 2.5rem;
+  }
+  
+  .benefit-card h3 {
+    font-size: 1.2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .research-evidence {
+    padding: 2rem;
+  }
+  
+  .evidence-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .evidence-item {
+    padding: 1rem;
+  }
+  
+
   
   .recent-training-item {
     flex-direction: column;
@@ -1104,5 +1439,90 @@ const getTrainingResult = (training) => {
     align-items: flex-start;
     gap: 5px;
   }
+  
+  /* 训练效果响应式优化 */
+  .effect-card {
+    padding: 2rem;
+  }
+  
+  .effect-icon {
+    font-size: 2.8rem;
+  }
+  
+  .effect-card h3 {
+    font-size: 1.2rem;
+  }
+  
+  .effect-description {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .effect-stats {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .effect-stat .value {
+    font-size: 1.5rem;
+  }
 }
+
+@media (max-width: 480px) {
+  .hero-content .title-main {
+    font-size: 2rem;
+  }
+  
+  .stats-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1.5rem;
+  }
+  
+  .module-card {
+    padding: 1.5rem;
+  }
+  
+  .effect-card {
+    padding: 1.5rem;
+  }
+  
+  .effect-icon {
+    font-size: 2.5rem;
+  }
+  
+  .benefit-card {
+    padding: 1.5rem;
+  }
+  
+  .research-evidence {
+    padding: 1.5rem;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .footer-section {
+    padding: 40px 0 20px;
+    margin-top: 60px;
+  }
+
+  .footer-info h3 {
+    font-size: 24px;
+  }
+}
+
+
 </style>

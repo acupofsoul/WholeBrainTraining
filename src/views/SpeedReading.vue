@@ -1,13 +1,13 @@
 <template>
   <div class="speed-reading-container">
     <!-- 面包屑导航 -->
-    <div class="breadcrumb-nav" v-if="$route.path !== '/speed-reading'">
-      <button class="back-arrow" @click="goBack">←</button>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-item">速读训练</span>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-current">{{ getModuleTitle($route.path) }}</span>
-    </div>
+    <BreadcrumbDropdown 
+      v-if="$route.path !== '/speed-reading'"
+      :main-title="'速读训练'"
+      :main-path="'/speed-reading'"
+      :current-title="getModuleTitle($route.path)"
+      :sibling-modules="siblingModules"
+    />
 
     <!-- 主页面内容 -->
     <div v-if="$route.path === '/speed-reading'">
@@ -356,6 +356,7 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useTrainingStore } from '../stores';
 import SpeedReadingProgress from '../components/SpeedReadingProgress.vue';
+import BreadcrumbDropdown from '../components/BreadcrumbDropdown.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -751,6 +752,12 @@ const moduleTitles = {
   '/speed-reading/3d-reading': '3D图阅读训练'
 };
 
+// 同级模块列表
+const siblingModules = [
+  { path: '/speed-reading/article-reading', title: '文章阅读训练' },
+  { path: '/speed-reading/3d-reading', title: '3D图阅读训练' }
+];
+
 // 获取模块标题
 const getModuleTitle = (path) => {
   return moduleTitles[path] || '速读训练';
@@ -837,9 +844,10 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .speed-reading-container {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 2rem;
+  width: 90%;
   background: var(--color-bg);
   min-height: 100vh;
 }
@@ -872,8 +880,8 @@ onBeforeUnmount(() => {
 /* 训练模块网格 */
 .training-modules {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 2.5rem;
   margin-bottom: 3rem;
 }
 
@@ -1062,110 +1070,41 @@ onBeforeUnmount(() => {
   transform: translateY(0);
 }
 
-/* 面包屑导航样式 */
+/* 面包屑导航样式 - 菜单栏下方小字显示 */
 .breadcrumb-nav {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-  padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-.breadcrumb-nav::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
-}
-
-.back-arrow {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  width: auto;
-  height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-right: 0;
-  padding: 0.75rem 1.25rem;
   gap: 0.5rem;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  position: relative;
-  overflow: hidden;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
-.back-arrow::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
 
-.back-arrow:hover::before {
-  left: 100%;
-}
-
-.back-arrow:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-}
-
-.back-arrow:active {
-  transform: translateY(0);
-}
 
 .breadcrumb-separator {
-  color: #94a3b8;
-  font-size: 1.2rem;
-  font-weight: 300;
-  opacity: 0.7;
+  color: #666;
+  font-size: 0.8rem;
   margin: 0;
 }
 
 .breadcrumb-item {
-  color: #64748b;
-  font-weight: 500;
-  font-size: 0.95rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .breadcrumb-item:hover {
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.08);
+  color: var(--color-primary);
 }
 
 .breadcrumb-current {
-  color: #1e40af;
+  color: var(--color-primary);
   font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 10px;
-  position: relative;
+  font-size: 0.8rem;
 }
 
 .breadcrumb-current::before {

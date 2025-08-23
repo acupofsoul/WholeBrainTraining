@@ -278,93 +278,21 @@
       </div>
     </div>
 
-    <!-- 训练设置 -->
-    <div class="training-settings" v-if="!trainingManager.isTraining.value">
-      <h3>训练设置</h3>
-      <div class="settings-grid">
-        <!-- 基础设置 -->
-        <div class="settings-group">
-          <h4>基础设置</h4>
-          <div class="setting-item">
-            <label>声音效果</label>
-            <button 
-              class="toggle-btn" 
-              :class="{ active: settingsManager.settings.soundEnabled }"
-              @click="settingsManager.toggleSetting('soundEnabled')"
-            >
-              {{ settingsManager.settings.soundEnabled ? '开启' : '关闭' }}
-            </button>
-          </div>
-          <div class="setting-item">
-            <label>震动反馈</label>
-            <button 
-              class="toggle-btn" 
-              :class="{ active: settingsManager.settings.vibrationEnabled }"
-              @click="settingsManager.toggleSetting('vibrationEnabled')"
-            >
-              {{ settingsManager.settings.vibrationEnabled ? '开启' : '关闭' }}
-            </button>
-          </div>
-          <div class="setting-item">
-            <label>视觉反馈</label>
-            <button 
-              class="toggle-btn" 
-              :class="{ active: settingsManager.settings.visualFeedback }"
-              @click="settingsManager.toggleSetting('visualFeedback')"
-            >
-              {{ settingsManager.settings.visualFeedback ? '开启' : '关闭' }}
-            </button>
-          </div>
-        </div>
+    <!-- 设置按钮 -->
+    <SettingsButton 
+      v-if="!trainingManager.isTraining.value" 
+      @click="openSettings" 
+    />
 
-        <!-- 训练参数 -->
-        <div class="settings-group">
-          <h4>训练参数</h4>
-          <div class="setting-item">
-            <label>视野范围</label>
-            <div class="range-container">
-              <input 
-                type="range" 
-                min="200" 
-                max="800" 
-                step="50"
-                v-model="settingsManager.settings.visionRange"
-                @change="settingsManager.updateSetting('visionRange', $event.target.value)"
-              >
-              <span class="range-value">{{ settingsManager.settings.visionRange }}px</span>
-            </div>
-          </div>
-          <div class="setting-item">
-            <label>目标大小</label>
-            <div class="range-container">
-              <input 
-                type="range" 
-                min="10" 
-                max="40" 
-                step="5"
-                v-model="settingsManager.settings.targetSize"
-                @change="settingsManager.updateSetting('targetSize', $event.target.value)"
-              >
-              <span class="range-value">{{ settingsManager.settings.targetSize }}px</span>
-            </div>
-          </div>
-          <div class="setting-item">
-            <label>训练轮数</label>
-            <div class="range-container">
-              <input 
-                type="range" 
-                min="3" 
-                max="10" 
-                step="1"
-                v-model="settingsManager.settings.sessionCount"
-                @change="settingsManager.updateSetting('sessionCount', $event.target.value)"
-              >
-              <span class="range-value">{{ settingsManager.settings.sessionCount }}轮</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- 设置弹窗 -->
+    <SettingsModal
+      v-if="showSettingsModal"
+      :sections="settingsSections"
+      :settings="settings"
+      @close="closeSettings"
+      @save="saveSettings"
+      @reset="resetSettings"
+    />
 
     <!-- 统计数据 -->
     <div class="statistics-section" v-if="!trainingManager.isTraining.value">
@@ -480,15 +408,35 @@
 <script>
 import { useBasicTraining, useBasicTrainingSettings, useBasicTrainingStats } from '@/composables/useBasicTraining'
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
+import SettingsModal from '@/components/SettingsModal.vue'
+import SettingsButton from '@/components/SettingsButton.vue'
+import { useTrainingSettings } from '@/composables/useTrainingSettings'
 
 export default {
   name: 'ExpandVision',
+  components: {
+    SettingsModal,
+    SettingsButton
+  },
   emits: ['back'],
   setup(props, { emit }) {
     // 使用统一的基础训练管理
     const trainingManager = useBasicTraining('expand_vision')
     const settingsManager = useBasicTrainingSettings(trainingManager)
     const statsManager = useBasicTrainingStats(trainingManager)
+    
+    // 使用新的设置管理系统
+    const {
+      settings,
+      settingsSections,
+      showSettingsModal,
+      isLoading: settingsLoading,
+      error: settingsError,
+      saveSettings: handleSettingsSave,
+      resetSettings: handleSettingsReset,
+      openSettings,
+      closeSettings
+    } = useTrainingSettings('expandVision')
     
     // 扩大视野训练特有的状态
     const selectedMode = ref(null)
@@ -1243,6 +1191,25 @@ export default {
       }
     }
     
+    // 设置应用方法
+    const applySettingsToTraining = () => {
+      // 应用设置到训练管理器
+      if (settingsManager && settings.value) {
+        Object.keys(settings.value).forEach(key => {
+          if (settingsManager.settings[key] !== undefined) {
+            settingsManager.settings[key] = settings.value[key]
+          }
+        })
+      }
+    }
+    
+    // settingsSections 现在由useTrainingSettings提供
+    
+    // 生命周期钩子
+    onMounted(() => {
+      // 设置加载现在由composable自动处理
+    })
+    
     // 清理函数
     onUnmounted(() => {
       stopTimer()
@@ -1313,7 +1280,16 @@ export default {
       isTargetShape,
       getTrendText,
       closeCompletionModal,
-      startNextTraining
+      startNextTraining,
+      
+      // 设置相关
+      showSettingsModal,
+      settings,
+      settingsSections,
+      openSettings,
+      closeSettings,
+      saveSettings,
+      resetSettings
     }
   }
 }
@@ -1889,110 +1865,7 @@ export default {
   background: #5a6fd8;
 }
 
-/* 训练设置 */
-.training-settings {
-  max-width: 1000px;
-  margin: 0 auto 40px;
-}
 
-.training-settings h3 {
-  color: white;
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 1.5rem;
-}
-
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
-}
-
-.settings-group {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 15px;
-  padding: 25px;
-}
-
-.settings-group h4 {
-  margin: 0 0 20px 0;
-  color: #333;
-  font-size: 1.2rem;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
-}
-
-.setting-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-}
-
-.setting-item label {
-  font-weight: bold;
-  color: #333;
-}
-
-.toggle-btn {
-  padding: 8px 16px;
-  border: 2px solid #ddd;
-  border-radius: 20px;
-  background: white;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: bold;
-}
-
-.toggle-btn.active {
-  background: #667eea;
-  color: white;
-  border-color: #667eea;
-}
-
-.range-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.range-container input[type="range"] {
-  flex: 1;
-  height: 6px;
-  border-radius: 3px;
-  background: #ddd;
-  outline: none;
-  -webkit-appearance: none;
-}
-
-.range-container input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #667eea;
-  cursor: pointer;
-}
-
-.range-container input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #667eea;
-  cursor: pointer;
-  border: none;
-}
-
-.range-value {
-  min-width: 60px;
-  text-align: center;
-  font-weight: bold;
-  color: #667eea;
-}
 
 /* 统计数据 */
 .statistics-section {
@@ -2272,6 +2145,111 @@ export default {
 }
 
 /* 响应式设计 */
+/* 笔记本屏幕优化 (1024px-1440px) */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .expand-vision-container {
+    padding: 18px;
+  }
+  
+  .page-header h1 {
+    font-size: 2.2rem;
+  }
+  
+  .page-description {
+    font-size: 1.05rem;
+    max-width: 550px;
+  }
+  
+  .modes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+    max-width: 1200px;
+  }
+  
+  .mode-card {
+    padding: 22px;
+  }
+  
+  .mode-card h4 {
+    font-size: 1.2rem;
+  }
+  
+  .mode-description {
+    font-size: 0.9rem;
+  }
+  
+  .training-interface {
+    max-width: 900px;
+  }
+  
+  .training-card {
+    padding: 25px;
+  }
+  
+  .training-header h3 {
+    font-size: 1.4rem;
+  }
+  
+  .vision-field {
+    width: 550px;
+    height: 380px;
+  }
+  
+  .time-remaining {
+    font-size: 1.8rem;
+  }
+  
+  .session-info {
+    font-size: 1.05rem;
+  }
+  
+  .instruction {
+    font-size: 1.05rem;
+    padding: 14px;
+  }
+  
+  .training-stats {
+    gap: 18px;
+  }
+  
+  .settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  
+  .stats-overview {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+  
+  .completion-modal {
+    max-width: 500px;
+    padding: 35px;
+  }
+}
+
+/* 特定笔记本尺寸优化 (1024px-1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .modes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    max-width: 1100px;
+  }
+  
+  .vision-field {
+    width: 520px;
+    height: 360px;
+  }
+  
+  .training-interface {
+    max-width: 850px;
+  }
+  
+  .completion-stats {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+}
+
 @media (max-width: 768px) {
   .expand-vision-container {
     padding: 15px;

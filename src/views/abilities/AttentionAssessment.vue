@@ -3,105 +3,33 @@
     <!-- 测评设置阶段 -->
     <div v-if="currentPhase === 'setup'" class="setup-phase fade-in">
       <div class="setup-container">
-        <h1 class="assessment-title">注意力能力测评</h1>
-        <p class="assessment-description">
-          全面评估您的注意力能力，包括持续注意力、选择性注意力、分配性注意力和执行注意力等多个维度。
-        </p>
+        <div class="assessment-header">
+          <h1 class="assessment-title">注意力能力测评</h1>
+          <p class="assessment-description">
+            全面评估您的注意力能力，包括持续注意力、选择性注意力、分配性注意力和执行注意力等多个维度。
+          </p>
+        </div>
         
         <div class="setup-content">
-          <!-- 测评模块选择 -->
-          <div class="module-selection">
-            <h3 class="section-title">选择测评模块</h3>
-            <div class="modules-grid">
-              <div 
-                v-for="module in availableModules" 
-                :key="module.id"
-                class="module-card"
-                :class="{ 'selected': selectedModules.includes(module.id) }"
-                @click="toggleModule(module.id)"
-              >
-                <div class="module-icon">{{ module.icon }}</div>
-                <div class="module-info">
-                  <h4 class="module-name">{{ module.name }}</h4>
-                  <p class="module-description">{{ module.description }}</p>
-                  <div class="module-stats">
-                    <span class="stat-item">⏱️ {{ module.duration }}分钟</span>
-                    <span class="stat-item">📊 {{ module.questions }}题</span>
-                  </div>
-                </div>
-                <div class="selection-indicator">
-                  <i class="fas fa-check"></i>
-                </div>
-              </div>
+          <!-- 快速设置预览 -->
+          <div class="settings-preview">
+            <div class="preview-item">
+              <span class="preview-label">测试模块:</span>
+              <span class="preview-value">{{ selectedModulesText }}</span>
+            </div>
+            <div class="preview-item">
+              <span class="preview-label">难度等级:</span>
+              <span class="preview-value">{{ difficultyText }}</span>
+            </div>
+            <div class="preview-item">
+              <span class="preview-label">预计时长:</span>
+              <span class="preview-value">{{ estimatedDuration }}分钟</span>
             </div>
           </div>
           
-          <!-- 难度设置 -->
-          <div class="difficulty-setting">
-            <h3 class="section-title">难度设置</h3>
-            <div class="difficulty-options">
-              <div 
-                v-for="level in difficultyLevels" 
-                :key="level.value"
-                class="difficulty-option"
-                :class="{ 'selected': selectedDifficulty === level.value }"
-                @click="selectedDifficulty = level.value"
-              >
-                <div class="difficulty-icon">{{ level.icon }}</div>
-                <div class="difficulty-info">
-                  <h4 class="difficulty-name">{{ level.name }}</h4>
-                  <p class="difficulty-description">{{ level.description }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 测评模式 -->
-          <div class="mode-setting">
-            <h3 class="section-title">测评模式</h3>
-            <div class="mode-options">
-              <div 
-                v-for="mode in assessmentModes" 
-                :key="mode.value"
-                class="mode-option"
-                :class="{ 'selected': selectedMode === mode.value }"
-                @click="selectedMode = mode.value"
-              >
-                <div class="mode-icon">{{ mode.icon }}</div>
-                <div class="mode-info">
-                  <h4 class="mode-name">{{ mode.name }}</h4>
-                  <p class="mode-description">{{ mode.description }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 个性化设置 -->
-          <div class="personal-settings">
-            <h3 class="section-title">个性化设置</h3>
-            <div class="settings-grid">
-              <div class="setting-item">
-                <label class="setting-label">启用音效提示</label>
-                <input type="checkbox" v-model="settings.soundEnabled" class="setting-checkbox">
-              </div>
-              <div class="setting-item">
-                <label class="setting-label">显示进度提示</label>
-                <input type="checkbox" v-model="settings.progressHints" class="setting-checkbox">
-              </div>
-              <div class="setting-item">
-                <label class="setting-label">自动保存结果</label>
-                <input type="checkbox" v-model="settings.autoSave" class="setting-checkbox">
-              </div>
-              <div class="setting-item">
-                <label class="setting-label">休息间隔（分钟）</label>
-                <select v-model="settings.breakInterval" class="setting-select">
-                  <option value="0">无休息</option>
-                  <option value="5">5分钟</option>
-                  <option value="10">10分钟</option>
-                  <option value="15">15分钟</option>
-                </select>
-              </div>
-            </div>
+          <!-- 设置按钮 -->
+          <div class="settings-actions">
+            <SettingsButton @click="openSettings" />
           </div>
         </div>
         
@@ -112,6 +40,16 @@
         </div>
       </div>
     </div>
+    
+    <!-- 设置弹窗 -->
+    <SettingsModal
+      v-if="showSettingsModal"
+      title="注意力测评设置"
+      :sections="settingsSections"
+      @close="closeSettings"
+      @save="saveSettings"
+      @reset="resetSettings"
+    />
 
     <!-- 测评进行中阶段 -->
     <div v-else-if="currentPhase === 'testing'" class="testing-phase">
@@ -304,15 +242,32 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'AttentionAssessment',
-  data() {
-    return {
-      currentPhase: 'setup', // setup, testing, results
-      
-      // 可用模块
-      availableModules: [
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+// import { useUserStore } from '@/stores/user' // 暂时移除，store不存在
+// import { useAssessmentStore } from '@/stores/assessment' // 暂时移除，使用localStorage代替
+import { useAbilityTestSettings } from '@/composables/useAbilityTestSettings'
+import SettingsModal from '@/components/SettingsModal.vue'
+import SettingsButton from '@/components/SettingsButton.vue'
+import AttentionTest from '@/components/tests/AttentionTest.vue'
+import SustainedAttentionTest from '@/components/tests/SustainedAttentionTest.vue'
+import SelectiveAttentionTest from '@/components/tests/SelectiveAttentionTest.vue'
+import DividedAttentionTest from '@/components/tests/DividedAttentionTest.vue'
+import ExecutiveAttentionTest from '@/components/tests/ExecutiveAttentionTest.vue'
+
+// 组合式函数
+const router = useRouter()
+// const userStore = useUserStore() // 暂时移除
+// const assessmentStore = useAssessmentStore() // 暂时移除
+const { settings, updateSettings, resetSettings, settingsSections, estimatedDuration } = useAbilityTestSettings('attention')
+
+// 响应式数据
+const currentPhase = ref('setup') // setup, testing, results
+const showSettingsModal = ref(false)
+
+// 可用模块
+const availableModules = ref([
         {
           id: 'sustained',
           name: '持续注意力测试',
@@ -349,365 +304,347 @@ export default {
           questions: 18,
           component: 'ExecutiveAttentionTest'
         }
-      ],
-      
-      // 难度等级
-      difficultyLevels: [
-        {
-          value: 'easy',
-          name: '简单',
-          description: '适合初学者，较慢的节奏和简单的任务',
-          icon: '🟢'
-        },
-        {
-          value: 'medium',
-          name: '中等',
-          description: '适合有一定基础的用户，中等难度',
-          icon: '🟡'
-        },
-        {
-          value: 'hard',
-          name: '困难',
-          description: '适合有经验的用户，快节奏和复杂任务',
-          icon: '🔴'
-        },
-        {
-          value: 'expert',
-          name: '专家',
-          description: '最高难度，适合专业人士',
-          icon: '🟣'
-        }
-      ],
-      
-      // 测评模式
-      assessmentModes: [
-        {
-          value: 'comprehensive',
-          name: '综合测评',
-          description: '完整的注意力能力评估，包含所有维度',
-          icon: '📊'
-        },
-        {
-          value: 'quick',
-          name: '快速测评',
-          description: '简化版测评，用时较短',
-          icon: '⚡'
-        },
-        {
-          value: 'custom',
-          name: '自定义测评',
-          description: '根据个人需求选择特定模块',
-          icon: '⚙️'
-        }
-      ],
-      
-      // 用户选择
-      selectedModules: ['sustained', 'selective'],
-      selectedDifficulty: 'medium',
-      selectedMode: 'comprehensive',
-      
-      // 个性化设置
-      settings: {
-        soundEnabled: true,
-        progressHints: true,
-        autoSave: true,
-        breakInterval: 10
-      },
-      
-      // 测试状态
-      currentModuleIndex: 0,
-      moduleResults: [],
-      totalElapsedTime: 0,
-      testTimer: null,
-      
-      // 测试设置
-      testSettings: {}
-    }
-  },
+      ])
+
+// 测试状态
+const currentModuleIndex = ref(0)
+const moduleResults = ref([])
+const totalElapsedTime = ref(0)
+const testTimer = ref(null)
+const testSettings = ref({})
+
+// 计算属性
+const selectedModulesText = computed(() => {
+  const modules = availableModules.value.filter(m => settings.value.selectedModules.includes(m.id))
+  return modules.length > 0 ? modules.map(m => m.name).join(', ') : '未选择'
+})
+
+const difficultyText = computed(() => {
+  const difficultyMap = {
+    easy: '简单',
+    medium: '中等', 
+    hard: '困难',
+    expert: '专家'
+  }
+  return difficultyMap[settings.value.difficulty] || '中等'
+})
+
+const canStartAssessment = computed(() => {
+  return settings.value.selectedModules.length > 0
+})
+
+const currentModuleInfo = computed(() => {
+  if (currentModuleIndex.value < settings.value.selectedModules.length) {
+    const moduleId = settings.value.selectedModules[currentModuleIndex.value]
+    return availableModules.value.find(m => m.id === moduleId)
+  }
+  return null
+})
+
+const currentTestComponent = computed(() => {
+  if (currentModuleInfo.value) {
+    return currentModuleInfo.value.component
+  }
+  return null
+})
+// 额外的计算属性
+const overallProgress = computed(() => {
+  if (settings.value.selectedModules.length === 0) return 0
+  return ((currentModuleIndex.value + (moduleProgress.value || 0)) / settings.value.selectedModules.length) * 100
+})
+
+const moduleProgress = ref(0)
+
+const overallScore = computed(() => {
+  if (moduleResults.value.length === 0) return 0
+  const totalScore = moduleResults.value.reduce((sum, result) => sum + result.score, 0)
+  return Math.round(totalScore / moduleResults.value.length)
+})
+
+const sustainedAttentionScore = computed(() => {
+  const result = moduleResults.value.find(r => r.moduleId === 'sustained')
+  return result ? result.score : 0
+})
+
+const selectiveAttentionScore = computed(() => {
+  const result = moduleResults.value.find(r => r.moduleId === 'selective')
+  return result ? result.score : 0
+})
+
+const dividedAttentionScore = computed(() => {
+  const result = moduleResults.value.find(r => r.moduleId === 'divided')
+  return result ? result.score : 0
+})
+
+const executiveAttentionScore = computed(() => {
+  const result = moduleResults.value.find(r => r.moduleId === 'executive')
+  return result ? result.score : 0
+})
+
+const abilityScores = computed(() => {
+  return {
+    '持续注意力': sustainedAttentionScore.value,
+    '选择性注意力': selectiveAttentionScore.value,
+    '分配性注意力': dividedAttentionScore.value,
+    '执行注意力': executiveAttentionScore.value
+  }
+})
+
+const totalQuestions = computed(() => {
+  return moduleResults.value.reduce((sum, result) => sum + result.totalQuestions, 0)
+})
+
+const correctAnswers = computed(() => {
+  return moduleResults.value.reduce((sum, result) => sum + result.correctAnswers, 0)
+})
+
+const overallAccuracy = computed(() => {
+  return totalQuestions.value > 0 ? (correctAnswers.value / totalQuestions.value) * 100 : 0
+})
+
+const averageReactionTime = computed(() => {
+  if (moduleResults.value.length === 0) return 0
+  const totalTime = moduleResults.value.reduce((sum, result) => sum + result.averageTime, 0)
+  return Math.round(totalTime / moduleResults.value.length)
+})
+// 方法
+const openSettings = () => {
+  showSettingsModal.value = true
+}
+
+const closeSettings = () => {
+  showSettingsModal.value = false
+}
+
+const saveSettings = (newSettings) => {
+  updateSettings(newSettings)
+  closeSettings()
+}
+
+const resetSettingsToDefault = () => {
+  resetSettings()
+}
+
+const startAssessment = () => {
+  if (!canStartAssessment.value) return
   
-  computed: {
-    canStartAssessment() {
-      return this.selectedModules.length > 0
-    },
-    
-    estimatedDuration() {
-      return this.selectedModules.reduce((total, moduleId) => {
-        const module = this.availableModules.find(m => m.id === moduleId)
-        return total + (module ? module.duration : 0)
-      }, 0)
-    },
-    
-    currentModuleInfo() {
-      if (this.currentModuleIndex < this.selectedModules.length) {
-        const moduleId = this.selectedModules[this.currentModuleIndex]
-        return this.getModuleInfo(moduleId)
-      }
-      return {}
-    },
-    
-    currentTestComponent() {
-      return this.currentModuleInfo.component
-    },
-    
-    overallProgress() {
-      if (this.selectedModules.length === 0) return 0
-      return ((this.currentModuleIndex + this.currentModuleProgress) / this.selectedModules.length) * 100
-    },
-    
-    currentModuleProgress() {
-      // 这个值会从子组件传递过来
-      return this.moduleProgress || 0
-    },
-    
-    // 结果计算
-    overallScore() {
-      if (this.moduleResults.length === 0) return 0
-      const totalScore = this.moduleResults.reduce((sum, result) => sum + result.score, 0)
-      return Math.round(totalScore / this.moduleResults.length)
-    },
-    
-    sustainedAttentionScore() {
-      const result = this.moduleResults.find(r => r.moduleId === 'sustained')
-      return result ? result.score : 0
-    },
-    
-    selectiveAttentionScore() {
-      const result = this.moduleResults.find(r => r.moduleId === 'selective')
-      return result ? result.score : 0
-    },
-    
-    dividedAttentionScore() {
-      const result = this.moduleResults.find(r => r.moduleId === 'divided')
-      return result ? result.score : 0
-    },
-    
-    executiveAttentionScore() {
-      const result = this.moduleResults.find(r => r.moduleId === 'executive')
-      return result ? result.score : 0
-    },
-    
-    abilityScores() {
-      return {
-        '持续注意力': this.sustainedAttentionScore,
-        '选择性注意力': this.selectiveAttentionScore,
-        '分配性注意力': this.dividedAttentionScore,
-        '执行注意力': this.executiveAttentionScore
-      }
-    },
-    
-    totalQuestions() {
-      return this.moduleResults.reduce((sum, result) => sum + result.totalQuestions, 0)
-    },
-    
-    correctAnswers() {
-      return this.moduleResults.reduce((sum, result) => sum + result.correctAnswers, 0)
-    },
-    
-    overallAccuracy() {
-      return this.totalQuestions > 0 ? (this.correctAnswers / this.totalQuestions) * 100 : 0
-    },
-    
-    averageReactionTime() {
-      if (this.moduleResults.length === 0) return 0
-      const totalTime = this.moduleResults.reduce((sum, result) => sum + result.averageTime, 0)
-      return Math.round(totalTime / this.moduleResults.length)
-    }
-  },
+  currentPhase.value = 'testing'
+  currentModuleIndex.value = 0
+  moduleResults.value = []
+  totalElapsedTime.value = 0
   
-  methods: {
-    toggleModule(moduleId) {
-      const index = this.selectedModules.indexOf(moduleId)
-      if (index > -1) {
-        this.selectedModules.splice(index, 1)
-      } else {
-        this.selectedModules.push(moduleId)
-      }
-    },
-    
-    startAssessment() {
-      this.currentPhase = 'testing'
-      this.currentModuleIndex = 0
-      this.moduleResults = []
-      this.totalElapsedTime = 0
-      this.startTimer()
-      this.prepareTestSettings()
-    },
-    
-    prepareTestSettings() {
-      this.testSettings = {
-        difficulty: this.selectedDifficulty,
-        mode: this.selectedMode,
-        ...this.settings
-      }
-    },
-    
-    startTimer() {
-      this.testTimer = setInterval(() => {
-        this.totalElapsedTime += 1000
-      }, 1000)
-    },
-    
-    stopTimer() {
-      if (this.testTimer) {
-        clearInterval(this.testTimer)
-        this.testTimer = null
-      }
-    },
-    
-    onTestComplete(result) {
-      // 保存当前模块结果
-      this.moduleResults.push({
-        moduleId: this.selectedModules[this.currentModuleIndex],
-        ...result
-      })
-      
-      // 进入下一个模块或完成测评
-      this.currentModuleIndex++
-      if (this.currentModuleIndex >= this.selectedModules.length) {
-        this.finishAssessment()
-      } else {
-        // 可以在这里添加模块间的休息时间
-        this.prepareTestSettings()
-      }
-    },
-    
-    onTestProgress(progress) {
-      this.moduleProgress = progress
-    },
-    
-    finishAssessment() {
-      this.currentPhase = 'results'
-      this.stopTimer()
-      
-      // 保存结果到本地存储
-      if (this.settings.autoSave) {
-        this.saveResults()
-      }
-    },
-    
-    saveResults() {
-      const results = {
-        timestamp: new Date().toISOString(),
-        overallScore: this.overallScore,
-        moduleResults: this.moduleResults,
-        totalElapsedTime: this.totalElapsedTime,
-        settings: this.testSettings
-      }
-      
-      // 保存到localStorage
-      const savedResults = JSON.parse(localStorage.getItem('attentionAssessmentResults') || '[]')
-      savedResults.push(results)
-      localStorage.setItem('attentionAssessmentResults', JSON.stringify(savedResults))
-    },
-    
-    restartAssessment() {
-      this.currentPhase = 'setup'
-      this.currentModuleIndex = 0
-      this.moduleResults = []
-      this.totalElapsedTime = 0
-      this.moduleProgress = 0
-    },
-    
-    exportReport() {
-      // 导出测评报告
-      const reportData = {
-        title: '注意力能力测评报告',
-        date: new Date().toLocaleDateString(),
-        overallScore: this.overallScore,
-        abilityScores: this.abilityScores,
-        moduleResults: this.moduleResults,
-        totalElapsedTime: this.totalElapsedTime,
-        evaluation: this.getOverallEvaluation(),
-        suggestions: this.getImprovementSuggestions()
-      }
-      
-      // 创建并下载JSON文件
-      const dataStr = JSON.stringify(reportData, null, 2)
-      const dataBlob = new Blob([dataStr], { type: 'application/json' })
-      const url = URL.createObjectURL(dataBlob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `注意力测评报告_${new Date().toISOString().split('T')[0]}.json`
-      link.click()
-      URL.revokeObjectURL(url)
-    },
-    
-    getModuleInfo(moduleId) {
-      return this.availableModules.find(m => m.id === moduleId) || {}
-    },
-    
-    getPerformanceLevel(score) {
-      if (score >= 90) return '优秀'
-      if (score >= 80) return '良好'
-      if (score >= 70) return '中等'
-      if (score >= 60) return '及格'
-      return '需要改进'
-    },
-    
-    getOverallEvaluation() {
-      const score = this.overallScore
-      
-      if (score >= 90) {
-        return '优秀！您的注意力能力非常出色，在各个维度都表现优异。继续保持这种专注状态，可以尝试更具挑战性的任务。'
-      } else if (score >= 80) {
-        return '良好！您的注意力能力较强，在大部分任务中都能保持良好的专注度。通过针对性训练可以进一步提升。'
-      } else if (score >= 70) {
-        return '中等！您的注意力能力处于平均水平，还有较大的提升空间。建议加强注意力训练，特别是在薄弱环节。'
-      } else if (score >= 60) {
-        return '需要改进！您的注意力能力有待提升，建议从基础训练开始，逐步提高专注度和持续性。'
-      } else {
-        return '需要加强！建议进行系统性的注意力训练，从简单任务开始，循序渐进地提升注意力能力。'
-      }
-    },
-    
-    getImprovementSuggestions() {
-      const suggestions = []
-      
-      // 基于整体得分的建议
-      if (this.overallScore < 70) {
-        suggestions.push('建议每天进行15-20分钟的专注力训练')
-        suggestions.push('尝试冥想或正念练习来提高注意力控制能力')
-      }
-      
-      // 基于各模块表现的建议
-      if (this.sustainedAttentionScore < 70) {
-        suggestions.push('加强持续注意力训练，可以尝试长时间的专注任务')
-      }
-      
-      if (this.selectiveAttentionScore < 70) {
-        suggestions.push('练习在嘈杂环境中保持专注，提高抗干扰能力')
-      }
-      
-      if (this.dividedAttentionScore < 70) {
-        suggestions.push('训练多任务处理能力，从简单的双任务开始')
-      }
-      
-      if (this.executiveAttentionScore < 70) {
-        suggestions.push('加强认知控制训练，如Stroop任务和冲突监控练习')
-      }
-      
-      // 基于反应时间的建议
-      if (this.averageReactionTime > 800) {
-        suggestions.push('提高反应速度，可以进行快速决策训练')
-      }
-      
-      // 通用建议
-      suggestions.push('保持规律的作息，充足的睡眠有助于注意力恢复')
-      suggestions.push('适当的体育锻炼可以提高大脑的注意力水平')
+  // 准备测试设置
+  testSettings.value = {
+    difficulty: settings.value.difficulty,
+    soundEnabled: settings.value.soundEnabled,
+    progressHints: settings.value.progressHints
+  }
+  
+  startTimer()
+}
+
+const startTimer = () => {
+  const startTime = Date.now()
+  testTimer.value = setInterval(() => {
+    totalElapsedTime.value = Math.floor((Date.now() - startTime) / 1000)
+  }, 1000)
+}
+
+const stopTimer = () => {
+  if (testTimer.value) {
+    clearInterval(testTimer.value)
+    testTimer.value = null
+  }
+}
+
+const onTestComplete = (result) => {
+  moduleResults.value.push({
+    moduleId: settings.value.selectedModules[currentModuleIndex.value],
+    ...result
+  })
+  
+  currentModuleIndex.value++
+  
+  if (currentModuleIndex.value >= settings.value.selectedModules.length) {
+    // 所有模块完成
+    finishAssessment()
+  }
+}
+
+const onTestProgress = (progress) => {
+  moduleProgress.value = progress
+}
+
+const finishAssessment = () => {
+  stopTimer()
+  currentPhase.value = 'results'
+  
+  // 保存结果到store
+  const assessmentResult = {
+    type: 'attention',
+    modules: settings.value.selectedModules,
+    difficulty: settings.value.difficulty,
+    results: moduleResults.value,
+    totalTime: totalElapsedTime.value,
+    timestamp: new Date().toISOString()
+  }
+  
+  // 使用localStorage保存测评结果
+  const savedResults = JSON.parse(localStorage.getItem('attentionAssessmentResults') || '[]')
+  savedResults.push(assessmentResult)
+  localStorage.setItem('attentionAssessmentResults', JSON.stringify(savedResults))
+}
+
+const getModuleInfo = (moduleId) => {
+  return availableModules.value.find(m => m.id === moduleId) || {}
+}
+
+const getPerformanceLevel = (score) => {
+  if (score >= 90) return '优秀'
+  if (score >= 80) return '良好'
+  if (score >= 70) return '中等'
+  if (score >= 60) return '及格'
+  return '需要改进'
+}
+
+const restartAssessment = () => {
+  currentPhase.value = 'setup'
+  currentModuleIndex.value = 0
+  moduleResults.value = []
+  totalElapsedTime.value = 0
+  moduleProgress.value = 0
+  stopTimer()
+}
+
+const exportReport = () => {
+  // 导出测评报告
+  const reportData = {
+    title: '注意力能力测评报告',
+    date: new Date().toLocaleDateString(),
+    overallScore: overallScore.value,
+    abilityScores: abilityScores.value,
+    moduleResults: moduleResults.value,
+    totalElapsedTime: totalElapsedTime.value,
+    evaluation: getOverallEvaluation(),
+    suggestions: getImprovementSuggestions()
+  }
+  
+  // 创建并下载JSON文件
+  const dataStr = JSON.stringify(reportData, null, 2)
+  const dataBlob = new Blob([dataStr], { type: 'application/json' })
+  const url = URL.createObjectURL(dataBlob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `注意力测评报告_${new Date().toISOString().split('T')[0]}.json`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+const goHome = () => {
+  router.push('/')
+}
+
+const getOverallEvaluation = () => {
+  const score = overallScore.value
+  if (score >= 90) return '您的注意力能力非常优秀，各项指标都表现出色。'
+  if (score >= 80) return '您的注意力能力良好，大部分指标表现不错。'
+  if (score >= 70) return '您的注意力能力中等，还有提升空间。'
+  if (score >= 60) return '您的注意力能力及格，建议加强训练。'
+  return '您的注意力能力需要改进，建议进行系统性训练。'
+}
+
+const getImprovementSuggestions = () => {
+  const suggestions = []
+  if (sustainedAttentionScore.value < 70) {
+    suggestions.push('建议进行持续注意力训练，如冥想、专注练习等。')
+  }
+  if (selectiveAttentionScore.value < 70) {
+    suggestions.push('建议进行选择性注意力训练，如视觉搜索任务。')
+  }
+  if (dividedAttentionScore.value < 70) {
+    suggestions.push('建议进行分配性注意力训练，如多任务处理练习。')
+  }
+  if (executiveAttentionScore.value < 70) {
+    suggestions.push('建议进行执行注意力训练，如冲突解决任务。')
+  }
+  return suggestions
+}
+// 生命周期
+onMounted(() => {
+  // 初始化
+})
+
+onUnmounted(() => {
+  stopTimer()
+})
       
       return suggestions.slice(0, 6) // 最多返回6条建议
-    },
+    }
     
-    formatTime(ms) {
+    const formatTime = (ms) => {
       const seconds = Math.floor(ms / 1000)
       const minutes = Math.floor(seconds / 60)
       const remainingSeconds = seconds % 60
       return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
     }
-  },
-  
-  beforeUnmount() {
-    this.stopTimer()
+    
+    return {
+      // 响应式数据
+      currentPhase,
+      showSettingsModal,
+      availableModules,
+      currentModuleIndex,
+      moduleResults,
+      totalElapsedTime,
+      testTimer,
+      testSettings,
+      
+      // 计算属性
+      selectedModulesText,
+      difficultyText,
+      canStartAssessment,
+      currentModuleInfo,
+      currentTestComponent,
+      overallProgress,
+      overallScore,
+      sustainedAttentionScore,
+      selectiveAttentionScore,
+      dividedAttentionScore,
+      executiveAttentionScore,
+      abilityScores,
+      totalQuestions,
+      correctAnswers,
+      overallAccuracy,
+      averageReactionTime,
+      
+      // 方法
+      openSettings,
+      closeSettings,
+      saveSettings,
+      resetSettings,
+      startAssessment,
+      stopAssessment,
+      startTimer,
+      stopTimer,
+      onTestComplete,
+      onTestProgress,
+      finishAssessment,
+      saveResults,
+      getModuleInfo,
+      getPerformanceLevel,
+      restartAssessment,
+      exportReport,
+      goHome,
+      getOverallEvaluation,
+      getImprovementSuggestions,
+      formatTime,
+      
+      // 来自composable的数据和方法
+      settings,
+      updateSettings,
+      resetToDefaults,
+      getSettingsByType
+    }
   }
 }
 </script>

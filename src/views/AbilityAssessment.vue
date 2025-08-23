@@ -1,16 +1,13 @@
 <template>
   <div class="ability-assessment-container">
     <!-- 面包屑导航 -->
-    <div class="breadcrumb-nav" v-if="$route.path !== '/ability-assessment' && $route.path !== '/abilities'">
-      <button class="back-btn" @click="goBack">
-        <span class="back-arrow">←</span>
-        返回
-      </button>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-item">能力测评</span>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-current">{{ getModuleTitle($route.path) }}</span>
-    </div>
+    <BreadcrumbDropdown 
+      v-if="$route.path !== '/ability-assessment' && $route.path !== '/abilities'"
+      :main-title="'能力测评'"
+      :main-path="'/ability-assessment'"
+      :current-title="getModuleTitle($route.path)"
+      :sibling-modules="siblingModules"
+    />
 
     <!-- 主页面内容 -->
     <div v-if="$route.path === '/ability-assessment' || $route.path === '/abilities'">
@@ -263,12 +260,22 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useTrainingStore } from '../stores';
+import BreadcrumbDropdown from '../components/BreadcrumbDropdown.vue';
 
 
 
 const router = useRouter();
 const route = useRoute();
 const trainingStore = useTrainingStore();
+
+// 同级模块列表
+const siblingModules = [
+  { path: '/ability-assessment/comprehensive', title: '综合能力测评' },
+  { path: '/ability-assessment/spatial', title: '空间能力测评' },
+  { path: '/ability-assessment/observation', title: '观察能力测评' },
+  { path: '/ability-assessment/calculation', title: '计算能力测评' },
+  { path: '/ability-assessment/memory', title: '记忆能力测评' }
+];
 
 // 各模块统计数据
 const comprehensiveStats = ref({ latestScore: 0, testCount: 0 });
@@ -539,7 +546,8 @@ onMounted(() => {
 
 <style scoped>
 .ability-assessment-container {
-  max-width: 1200px;
+  max-width: 1500px;
+  width: 90%;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -565,8 +573,8 @@ onMounted(() => {
 
 .assessment-modules {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
   margin-bottom: 3rem;
 }
 
@@ -920,116 +928,41 @@ onMounted(() => {
   transform: translateY(-1px);
 }
 
-/* 面包屑导航样式 */
+/* 面包屑导航样式 - 菜单栏下方小字显示 */
 .breadcrumb-nav {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-  padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-.breadcrumb-nav::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
-}
-
-.back-btn {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  position: relative;
-  overflow: hidden;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
-.back-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
 
-.back-btn:hover::before {
-  left: 100%;
-}
-
-.back-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-}
-
-.back-btn:active {
-  transform: translateY(0);
-}
-
-.back-arrow {
-  font-size: 1.1rem;
-  font-weight: bold;
-  transition: transform 0.3s ease;
-}
-
-.back-btn:hover .back-arrow {
-  transform: translateX(-2px);
-}
 
 .breadcrumb-separator {
-  color: #94a3b8;
-  font-size: 1.2rem;
-  font-weight: 300;
-  opacity: 0.7;
+  color: #666;
+  font-size: 0.8rem;
+  margin: 0;
 }
 
 .breadcrumb-item {
-  color: #64748b;
-  font-size: 0.95rem;
-  font-weight: 500;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  position: relative;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .breadcrumb-item:hover {
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.08);
+  color: var(--color-primary);
 }
 
 .breadcrumb-current {
-  color: #1e40af;
+  color: var(--color-primary);
   font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 10px;
-  position: relative;
+  font-size: 0.8rem;
 }
 
 .breadcrumb-current::before {

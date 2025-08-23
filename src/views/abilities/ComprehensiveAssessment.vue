@@ -627,7 +627,8 @@ onUnmounted(() => {
 
 <style scoped>
 .comprehensive-assessment {
-  max-width: 1200px;
+  max-width: 1500px;
+  width: 90%;
   margin: 0 auto;
   padding: 2rem;
 }

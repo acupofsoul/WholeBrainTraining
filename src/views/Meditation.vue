@@ -1,240 +1,71 @@
 <template>
   <div class="meditation-container">
     <!-- 面包屑导航 -->
-    <div class="breadcrumb-nav" v-if="$route.path !== '/meditation'">
-      <button @click="goBack" class="breadcrumb-item">
-        <i class="icon-arrow-left"></i>
-        冥想训练
-      </button>
-      <span class="breadcrumb-separator">></span>
-      <span class="breadcrumb-current">{{ getModuleTitle($route.path) }}</span>
-    </div>
+    <BreadcrumbDropdown 
+      v-if="$route.path !== '/meditation'"
+      :main-title="'冥想训练'"
+      :main-path="'/meditation'"
+      :current-title="getModuleTitle($route.path)"
+      :sibling-modules="siblingModules"
+    />
 
     <!-- 页面头部 -->
     <div class="page-header" v-if="$route.path === '/meditation'">
-      <div class="header-background">
-        <div class="floating-elements">
-          <div class="floating-circle circle-1"></div>
-          <div class="floating-circle circle-2"></div>
-          <div class="floating-circle circle-3"></div>
-        </div>
-      </div>
-      <h1>冥想与放松训练</h1>
+      <h1>冥想训练</h1>
       <p class="page-description">
-        通过冥想训练帮助孩子放松身心，提高专注力，为后续的全脑开发训练打下良好基础。
-        这是七田真全脑开发的第一阶段，也是最重要的基础训练。
+        通过冥想训练帮助放松身心，提高专注力
       </p>
-      
-      <!-- 快速开始按钮 -->
-      <div class="quick-start-section">
-        <button class="quick-start-btn" @click="startQuickSession">
-          <span class="btn-icon">⚡</span>
-          <span>快速开始 5分钟冥想</span>
-        </button>
-        <p class="quick-start-hint">基于您的偏好推荐最适合的冥想练习</p>
-      </div>
     </div>
 
-    <!-- 今日推荐 -->
-    <div class="daily-recommendation" v-if="dailyRecommendation && $route.path === '/meditation'">
-      <div class="recommendation-header">
-        <h3>🌟 今日推荐</h3>
-        <span class="recommendation-badge">个性化</span>
-      </div>
-      <div class="recommendation-content">
-        <div class="recommendation-info">
-          <h4>{{ dailyRecommendation.title }}</h4>
-          <p>{{ dailyRecommendation.description }}</p>
-          <div class="recommendation-meta">
-            <span class="duration">⏱️ {{ dailyRecommendation.duration }}分钟</span>
-            <span class="type">🎯 {{ dailyRecommendation.type }}</span>
-          </div>
+    <!-- 专项训练 -->
+    <div class="sub-modules-section" v-if="$route.path === '/meditation'">
+      <h2 class="section-title">专项训练</h2>
+      <div class="sub-modules-grid">
+        <div class="sub-module-card" @click="navigateTo('/meditation/breathing')">
+          <div class="sub-module-icon">🫁</div>
+          <h4>呼吸训练</h4>
+          <p>通过呼吸节奏训练提升专注力</p>
         </div>
-        <button class="start-recommendation-btn" @click="startRecommendation">
-          开始练习
-        </button>
+
+        <div class="sub-module-card" @click="navigateTo('/meditation/visualization')">
+          <div class="sub-module-icon">🌈</div>
+          <h4>想象力训练</h4>
+          <p>通过引导想象激发创造力</p>
+        </div>
+
+        <div class="sub-module-card" @click="navigateTo('/meditation/mindfulness')">
+          <div class="sub-module-icon">🧘‍♀️</div>
+          <h4>正念训练</h4>
+          <p>培养当下觉察能力</p>
+        </div>
       </div>
     </div>
 
     <!-- 训练模块 -->
-    <div class="modules-section" v-if="currentView === 'main'">
+    <div class="modules-section" v-if="$route.path === '/meditation'">
       <h2 class="section-title">训练模块</h2>
       <div class="training-modules">
-        <div class="module-card guided-meditation" @click="navigateTo('/meditation/guided-voice')">
-          <div class="module-header">
-            <div class="module-icon">🎧</div>
-            <div class="module-status" :class="{ active: moduleProgress.guidedMeditation > 0 }">
-              {{ moduleProgress.guidedMeditation > 0 ? '进行中' : '未开始' }}
-            </div>
-          </div>
-          <h3>语音引导冥想</h3>
-          <p>通过温和的语音引导，帮助孩子学会放松和集中注意力</p>
-          <div class="module-features">
-            <span class="feature-tag">🧘 深度放松</span>
-            <span class="feature-tag">🎵 背景音乐</span>
-            <span class="feature-tag">👶 适合初学者</span>
-          </div>
-          <div class="module-progress">
-            <div class="progress-bar">
-              <div class="progress-fill" :style="{ width: moduleProgress.guidedMeditation + '%' }"></div>
-            </div>
-            <span class="progress-text">{{ moduleProgress.guidedMeditation }}% 完成</span>
-          </div>
-          <div class="module-level">适合年龄：3-12岁</div>
+        <div class="module-card" @click="navigateTo('/meditation/guided')">
+          <div class="module-icon">🎧</div>
+          <h3>引导冥想</h3>
+          <p>通过语音引导学会放松和集中注意力</p>
         </div>
 
-        <div class="module-card brainwave" @click="navigateTo('/meditation/brainwave-generator')">
-          <div class="module-header">
-            <div class="module-icon">🧠</div>
-            <div class="module-status" :class="{ active: moduleProgress.brainwave > 0 }">
-              {{ moduleProgress.brainwave > 0 ? '进行中' : '未开始' }}
-            </div>
-          </div>
+        <div class="module-card" @click="navigateTo('/meditation/brainwave-generator')">
+          <div class="module-icon">🧠</div>
           <h3>脑波发生器</h3>
-          <p>使用特定频率的音频帮助大脑进入最佳学习状态</p>
-          <div class="module-features">
-            <span class="feature-tag">🌊 Alpha波</span>
-            <span class="feature-tag">⚡ Beta波</span>
-            <span class="feature-tag">🎯 专注训练</span>
-          </div>
-          <div class="module-progress">
-            <div class="progress-bar">
-              <div class="progress-fill" :style="{ width: moduleProgress.brainwave + '%' }"></div>
-            </div>
-            <span class="progress-text">{{ moduleProgress.brainwave }}% 完成</span>
-          </div>
-          <div class="module-level">适合年龄：5-12岁</div>
+          <p>使用特定频率音频帮助大脑进入最佳状态</p>
         </div>
 
-        <div class="module-card metronome" @click="navigateTo('/meditation/metronome')">
-          <div class="module-header">
-            <div class="module-icon">⏱️</div>
-            <div class="module-status" :class="{ active: moduleProgress.metronome > 0 }">
-              {{ moduleProgress.metronome > 0 ? '进行中' : '未开始' }}
-            </div>
-          </div>
+        <div class="module-card" @click="navigateTo('/meditation/metronome')">
+          <div class="module-icon">⏱️</div>
           <h3>节拍器训练</h3>
-          <p>通过有节奏的声音训练，提高专注力和时间感知能力</p>
-          <div class="module-features">
-            <span class="feature-tag">🎵 节奏感</span>
-            <span class="feature-tag">⏰ 时间感知</span>
-            <span class="feature-tag">🎯 专注力</span>
-          </div>
-          <div class="module-progress">
-            <div class="progress-bar">
-              <div class="progress-fill" :style="{ width: moduleProgress.metronome + '%' }"></div>
-            </div>
-            <span class="progress-text">{{ moduleProgress.metronome }}% 完成</span>
-          </div>
-          <div class="module-level">适合年龄：4-12岁</div>
+          <p>通过节奏训练提高专注力和时间感知</p>
         </div>
       </div>
     </div>
 
-    <!-- 进度统计 -->
-    <div class="progress-section" v-if="$route.path === '/meditation'">
-      <div class="section-header">
-        <h3>训练进度</h3>
-        <button class="view-details-btn" @click="showDetailedStats = !showDetailedStats">
-          {{ showDetailedStats ? '收起详情' : '查看详情' }}
-        </button>
-      </div>
-      
-      <div class="progress-overview">
-        <div class="stat-card primary">
-          <div class="stat-icon">⏱️</div>
-          <div class="stat-content">
-            <span class="stat-value">{{ totalTrainingTime }}</span>
-            <span class="stat-label">总训练时长（分钟）</span>
-            <div class="stat-trend positive">+{{ todayTrainingTime }}分钟 今日</div>
-          </div>
-        </div>
-        
-        <div class="stat-card secondary">
-          <div class="stat-icon">🔥</div>
-          <div class="stat-content">
-            <span class="stat-value">{{ consecutiveDays }}</span>
-            <span class="stat-label">连续训练天数</span>
-            <div class="stat-trend" :class="{ positive: consecutiveDays > 0 }">
-              {{ consecutiveDays > 0 ? '保持连续' : '开始训练' }}
-            </div>
-          </div>
-        </div>
-        
-        <div class="stat-card tertiary">
-          <div class="stat-icon">🎯</div>
-          <div class="stat-content">
-            <span class="stat-value">{{ completedModules }}/3</span>
-            <span class="stat-label">完成模块</span>
-            <div class="stat-trend" :class="{ positive: completedModules > 0 }">
-              {{ Math.round((completedModules / 3) * 100) }}% 完成
-            </div>
-          </div>
-        </div>
-        
-        <div class="stat-card quaternary">
-          <div class="stat-icon">🏆</div>
-          <div class="stat-content">
-            <span class="stat-value">{{ achievements.length }}</span>
-            <span class="stat-label">获得成就</span>
-            <div class="stat-trend positive">{{ latestAchievement || '继续努力' }}</div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 详细统计 -->
-      <div v-if="showDetailedStats" class="detailed-stats">
-        <div class="stats-grid">
-          <div class="detail-stat">
-            <h4>本周目标</h4>
-            <div class="goal-progress">
-              <div class="goal-bar">
-                <div class="goal-fill" :style="{ width: weeklyProgress + '%' }"></div>
-              </div>
-              <span class="goal-text">{{ weeklyTrainingTime }}/{{ weeklyGoal }}分钟</span>
-            </div>
-          </div>
-          
-          <div class="detail-stat">
-            <h4>最佳连续记录</h4>
-            <div class="best-streak">
-              <span class="streak-number">{{ bestStreak }}</span>
-              <span class="streak-unit">天</span>
-            </div>
-          </div>
-          
-          <div class="detail-stat">
-            <h4>平均会话时长</h4>
-            <div class="average-session">
-              <span class="session-number">{{ averageSessionLength }}</span>
-              <span class="session-unit">分钟</span>
-            </div>
-          </div>
-          
-          <div class="detail-stat">
-            <h4>最喜欢的模块</h4>
-            <div class="favorite-module">
-              <span class="module-name">{{ favoriteModule }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 成就系统 -->
-    <div class="achievements-section" v-if="achievements.length > 0 && $route.path === '/meditation'">
-      <h3>🏆 最近成就</h3>
-      <div class="achievements-list">
-        <div v-for="achievement in recentAchievements" :key="achievement.id" class="achievement-item">
-          <div class="achievement-icon">{{ achievement.icon }}</div>
-          <div class="achievement-info">
-            <h4>{{ achievement.title }}</h4>
-            <p>{{ achievement.description }}</p>
-            <span class="achievement-date">{{ formatDate(achievement.date) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+
 
     <!-- 子路由内容 -->
     <router-view v-if="$route.path !== '/meditation'" />
@@ -242,19 +73,40 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { useTrainingStore } from '../stores';
+import BreadcrumbDropdown from '../components/BreadcrumbDropdown.vue';
 
 const router = useRouter();
 const route = useRoute();
-const trainingStore = useTrainingStore();
+
+// 同级模块列表
+const siblingModules = [
+  { path: '/meditation/guided', title: '引导冥想' },
+  { path: '/meditation/brainwave-generator', title: '脑波发生器' },
+  { path: '/meditation/metronome', title: '节拍器训练' },
+  { path: '/meditation/breathing', title: '呼吸训练' },
+  { path: '/meditation/visualization', title: '想象力训练' },
+  { path: '/meditation/mindfulness', title: '正念训练' }
+];
 
 // 模块标题映射
 const moduleTitles = {
-  '/meditation/guided-voice': '语音引导冥想',
+  '/meditation/guided': '引导冥想',
   '/meditation/brainwave-generator': '脑波发生器',
-  '/meditation/metronome': '节拍器训练'
+  '/meditation/metronome': '节拍器训练',
+  '/meditation/breathing': '呼吸训练',
+  '/meditation/breathing/basic': '基础呼吸训练',
+  '/meditation/breathing/relaxation': '放松呼吸训练',
+  '/meditation/breathing/focus': '专注呼吸训练',
+  '/meditation/visualization': '想象力训练',
+  '/meditation/mindfulness': '正念训练',
+  '/meditation/guided/mindfulness': '正念冥想',
+  '/meditation/guided/relaxation': '放松冥想',
+  '/meditation/guided/focus': '专注冥想',
+  '/meditation/guided/sleep': '睡眠冥想',
+  '/meditation/guided/healing': '疗愈冥想',
+  '/meditation/guided/creativity': '创造力冥想'
 };
 
 // 获取模块标题
@@ -262,140 +114,12 @@ const getModuleTitle = (path) => {
   return moduleTitles[path] || '冥想训练';
 };
 
-// 基础统计数据
-const totalTrainingTime = ref(0);
-const consecutiveDays = ref(0);
-const completedModules = ref(0);
-const todayTrainingTime = ref(0);
-const showDetailedStats = ref(false);
-
-// 详细统计数据
-const weeklyTrainingTime = ref(0);
-const weeklyGoal = ref(150);
-const bestStreak = ref(0);
-const averageSessionLength = ref(0);
-const favoriteModule = ref('语音引导冥想');
-
-// 模块进度
-const moduleProgress = ref({
-  guidedMeditation: 0,
-  brainwave: 0,
-  metronome: 0
-});
-
-// 今日推荐
-const dailyRecommendation = ref({
-  title: '晨间唤醒冥想',
-  description: '以轻柔的引导和自然音效开始美好的一天',
-  duration: 10,
-  type: '语音引导'
-});
-
-// 成就系统
-const achievements = ref([
-  {
-    id: 1,
-    title: '初次体验',
-    description: '完成第一次冥想练习',
-    icon: '🌟',
-    date: new Date(Date.now() - 86400000) // 昨天
-  },
-  {
-    id: 2,
-    title: '坚持不懈',
-    description: '连续训练3天',
-    icon: '🔥',
-    date: new Date(Date.now() - 172800000) // 前天
-  }
-]);
-
-// 计算属性
-const weeklyProgress = computed(() => {
-  return Math.min((weeklyTrainingTime.value / weeklyGoal.value) * 100, 100);
-});
-
-const recentAchievements = computed(() => {
-  return achievements.value.slice(-3).reverse();
-});
-
-const latestAchievement = computed(() => {
-  return achievements.value.length > 0 ? achievements.value[achievements.value.length - 1].title : null;
-});
-
 // 方法
 const navigateTo = (path) => {
   router.push(path);
 };
 
-const goBack = () => {
-  router.push('/meditation');
-};
 
-const startQuickSession = () => {
-  // 根据用户偏好选择最适合的快速冥想
-  navigateTo('/meditation/guided-voice');
-};
-
-const startRecommendation = () => {
-  navigateTo('/meditation/guided-voice');
-};
-
-const formatDate = (date) => {
-  const now = new Date();
-  const diffTime = Math.abs(now - date);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  if (diffDays === 1) return '昨天';
-  if (diffDays === 2) return '前天';
-  if (diffDays <= 7) return `${diffDays}天前`;
-  return date.toLocaleDateString('zh-CN');
-};
-
-// 加载训练数据
-const loadTrainingData = async () => {
-  try {
-    // 从本地存储加载冥想训练数据
-    const saved = localStorage.getItem('meditationStats');
-    if (saved) {
-      const meditationStats = JSON.parse(saved);
-      totalTrainingTime.value = meditationStats.totalTime || 0;
-      consecutiveDays.value = meditationStats.consecutiveDays || 0;
-      completedModules.value = meditationStats.completedModules || 0;
-    } else {
-      // 初始化默认数据
-      totalTrainingTime.value = 0;
-      consecutiveDays.value = 0;
-      completedModules.value = 0;
-    }
-    
-    // 模拟加载详细数据
-    todayTrainingTime.value = Math.floor(Math.random() * 30) + 5;
-    weeklyTrainingTime.value = Math.floor(Math.random() * 120) + 30;
-    bestStreak.value = Math.max(consecutiveDays.value, Math.floor(Math.random() * 15) + 5);
-    averageSessionLength.value = Math.floor(Math.random() * 10) + 10;
-    
-    // 从本地存储加载模块进度数据
-    const moduleData = localStorage.getItem('meditationModuleProgress');
-    if (moduleData) {
-      const progress = JSON.parse(moduleData);
-      moduleProgress.value.guidedMeditation = progress.guidedMeditation || 0;
-      moduleProgress.value.brainwave = progress.brainwave || 0;
-      moduleProgress.value.metronome = progress.metronome || 0;
-    } else {
-      // 初始化默认进度
-      moduleProgress.value.guidedMeditation = 0;
-      moduleProgress.value.brainwave = 0;
-      moduleProgress.value.metronome = 0;
-    }
-    
-  } catch (error) {
-    console.error('加载训练数据失败:', error);
-  }
-};
-
-onMounted(() => {
-  loadTrainingData();
-});
 </script>
 
 <style scoped>
@@ -405,92 +129,45 @@ onMounted(() => {
   padding: 2rem;
 }
 
-/* 面包屑导航样式 */
+/* 面包屑导航样式 - 菜单栏下方小字显示 */
 .breadcrumb-nav {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-  padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-.breadcrumb-nav::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
 .breadcrumb-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  border: none;
-  color: white;
+  gap: 0.25rem;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.breadcrumb-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.breadcrumb-item:hover::before {
-  left: 100%;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  border: none;
+  background: none;
 }
 
 .breadcrumb-item:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-}
-
-.breadcrumb-item:active {
-  transform: translateY(0);
+  color: var(--color-primary);
 }
 
 .breadcrumb-separator {
-  color: #94a3b8;
-  font-size: 1.2rem;
-  font-weight: 300;
-  opacity: 0.7;
+  color: #666;
+  font-size: 0.8rem;
   margin: 0;
 }
 
 .breadcrumb-current {
-  color: #1e40af;
+  color: var(--color-primary);
   font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 10px;
-  position: relative;
+  font-size: 0.8rem;
 }
 
 .breadcrumb-current::before {
@@ -900,6 +577,12 @@ onMounted(() => {
   font-size: 1.5rem;
 }
 
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .view-details-btn {
   background: rgba(var(--color-primary-rgb), 0.1);
   color: var(--color-primary);
@@ -913,6 +596,26 @@ onMounted(() => {
 
 .view-details-btn:hover {
   background: rgba(var(--color-primary-rgb), 0.2);
+}
+
+.view-analytics-btn {
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.view-analytics-btn:hover {
+  background: var(--color-secondary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .progress-overview {
@@ -1086,71 +789,26 @@ onMounted(() => {
   font-size: 1.1rem;
 }
 
-/* 成就系统 */
-.achievements-section {
-  background: var(--color-card-bg);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: var(--shadow-md);
-  margin-bottom: 3rem;
-}
+/* 旧的成就系统样式已移除，现在使用AchievementSystem组件 */
 
-.achievements-section h3 {
-  color: var(--color-primary);
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.achievements-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.achievement-item {
-  background: rgba(var(--color-primary-rgb), 0.05);
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.1);
-  transition: all var(--transition-normal);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.achievement-item:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(var(--color-primary-rgb), 0.2);
-}
-
-.achievement-icon {
-  font-size: 2.5rem;
-  opacity: 0.8;
-  flex-shrink: 0;
-}
-
-.achievement-info {
-  flex: 1;
-}
-
-.achievement-info h4 {
-  color: var(--color-primary);
-  margin: 0 0 0.3rem 0;
-  font-size: 1.1rem;
-}
-
-.achievement-info p {
-  color: var(--color-text-secondary);
-  margin: 0 0 0.5rem 0;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.achievement-date {
-  font-size: 0.8rem;
-  color: var(--color-text-secondary);
-  opacity: 0.7;
+/* 平板设备优化 */
+@media (max-width: 1024px) {
+  .meditation-container {
+    padding: 1.5rem;
+  }
+  
+  .training-modules {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .module-card {
+    padding: 1.8rem;
+  }
+  
+  .sub-modules-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
 }
 
 /* 响应式设计 */
@@ -1169,11 +827,21 @@ onMounted(() => {
   
   .page-description {
     font-size: 1rem;
+    padding: 0 1rem;
   }
   
   .quick-start-btn {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    width: 100%;
+    max-width: 300px;
+    /* 触控优化 */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .quick-start-btn:active {
+    transform: scale(0.98);
   }
   
   .recommendation-content {
@@ -1184,14 +852,59 @@ onMounted(() => {
   
   .start-recommendation-btn {
     align-self: center;
+    padding: 0.8rem 1.5rem;
+    width: 100%;
+    max-width: 200px;
+    /* 触控优化 */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .start-recommendation-btn:active {
+    transform: scale(0.98);
   }
   
   .training-modules {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .module-card {
     padding: 1.5rem;
+    margin: 0;
+    /* 增强触控反馈 */
+    -webkit-tap-highlight-color: rgba(149, 225, 211, 0.2);
+    touch-action: manipulation;
+  }
+  
+  .module-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  .module-icon {
+    font-size: 2.5rem;
+  }
+  
+  .sub-modules-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .sub-module-card {
+    padding: 1.5rem;
+    /* 增强触控反馈 */
+    -webkit-tap-highlight-color: rgba(149, 225, 211, 0.2);
+    touch-action: manipulation;
+  }
+  
+  .sub-module-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  .sub-module-icon {
+    font-size: 2rem;
   }
   
   .progress-overview {
@@ -1201,10 +914,22 @@ onMounted(() => {
   
   .stat-card {
     padding: 1.5rem;
+    text-align: center;
   }
   
   .stat-value {
     font-size: 1.8rem;
+  }
+  
+  .achievement-item {
+    padding: 1rem;
+    /* 触控优化 */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  .achievement-item:active {
+    transform: scale(0.98);
   }
   
   .section-header {
@@ -1283,5 +1008,221 @@ onMounted(() => {
   .streak-number, .session-number {
     font-size: 1.5rem;
   }
+  
+  .sub-modules-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .sub-module-card {
+    padding: 1.5rem;
+  }
+}
+
+/* 触控设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  .module-card,
+  .sub-module-card,
+  .quick-start-btn,
+  .start-recommendation-btn {
+    /* 增加触控目标大小 */
+    min-height: 44px;
+    /* 移除悬停效果 */
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  
+  .module-card:hover,
+  .sub-module-card:hover,
+  .quick-start-btn:hover,
+  .start-recommendation-btn:hover {
+    transform: none;
+  }
+  
+  /* 添加触控反馈 */
+  .module-card:active,
+  .sub-module-card:active,
+  .quick-start-btn:active,
+  .start-recommendation-btn:active {
+    transform: scale(0.98);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .meditation-container {
+    padding: 0.5rem;
+  }
+  
+  .page-header {
+    padding: 1.5rem 0;
+  }
+  
+  .page-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .daily-recommendation {
+    padding: 1.5rem;
+  }
+  
+  .recommendation-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .module-card {
+    padding: 1rem;
+  }
+  
+  .module-features {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .progress-overview {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .detail-stat {
+    padding: 1rem;
+  }
+  
+  .streak-number, .session-number {
+    font-size: 1.5rem;
+  }
+  
+  .sub-modules-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .sub-module-card {
+    padding: 1.5rem;
+  }
+}
+
+/* 子模块样式 */
+.sub-modules-section {
+  margin-bottom: 3rem;
+}
+
+.sub-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.sub-module-card {
+  background: var(--color-card-bg);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sub-module-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(var(--color-primary-rgb), 0.05) 0%, 
+    rgba(var(--color-secondary-rgb), 0.05) 100%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.sub-module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(var(--color-primary-rgb), 0.2);
+}
+
+.sub-module-card:hover::before {
+  opacity: 1;
+}
+
+.sub-module-card.breathing {
+  border-left: 4px solid #4ECDC4;
+}
+
+.sub-module-card.visualization {
+  border-left: 4px solid #FF6B6B;
+}
+
+.sub-module-card.mindfulness {
+  border-left: 4px solid #95E1D3;
+}
+
+.sub-module-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.sub-module-card h4 {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.sub-module-card p {
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.sub-module-features {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sub-feature-tag {
+  background: rgba(var(--color-primary-rgb), 0.1);
+  color: var(--color-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.sub-module-card.breathing .sub-feature-tag {
+  background: rgba(78, 205, 196, 0.1);
+  color: #4ECDC4;
+}
+
+.sub-module-card.visualization .sub-feature-tag {
+  background: rgba(255, 107, 107, 0.1);
+  color: #FF6B6B;
+}
+
+.sub-module-card.mindfulness .sub-feature-tag {
+  background: rgba(149, 225, 211, 0.1);
+  color: #95E1D3;
 }
 </style>

@@ -2179,6 +2179,7 @@ export default {
   background: #ddd;
   outline: none;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .setting-group input[type="range"]::-webkit-slider-thumb {

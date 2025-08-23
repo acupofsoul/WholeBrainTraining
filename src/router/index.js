@@ -13,9 +13,41 @@ const routes = [
     component: () => import('../views/Meditation.vue'),
     children: [
       {
-        path: 'guided-voice',
-        name: 'GuidedVoice',
-        component: () => import('../views/meditation/GuidedMeditation.vue')
+        path: 'guided',
+        name: 'GuidedMeditation',
+        component: () => import('../views/meditation/GuidedMeditation.vue'),
+        children: [
+          {
+            path: 'mindfulness',
+            name: 'MindfulnessMeditation',
+            component: () => import('../views/meditation/MindfulnessMeditation.vue')
+          },
+          {
+            path: 'relaxation',
+            name: 'RelaxationMeditation',
+            component: () => import('../views/meditation/RelaxationMeditation.vue')
+          },
+          {
+            path: 'focus',
+            name: 'FocusMeditation',
+            component: () => import('../views/meditation/FocusMeditation.vue')
+          },
+          {
+            path: 'sleep',
+            name: 'SleepMeditation',
+            component: () => import('../views/meditation/SleepMeditation.vue')
+          },
+          {
+            path: 'healing',
+            name: 'HealingMeditation',
+            component: () => import('../views/meditation/HealingMeditation.vue')
+          },
+          {
+            path: 'creativity',
+            name: 'CreativityMeditation',
+            component: () => import('../views/meditation/CreativityMeditation.vue')
+          }
+        ]
       },
       {
         path: 'brainwave-generator',
@@ -26,6 +58,38 @@ const routes = [
         path: 'metronome',
         name: 'Metronome',
         component: () => import('../views/meditation/Metronome.vue')
+      },
+      {
+        path: 'breathing',
+        name: 'BreathingTraining',
+        component: () => import('../views/meditation/BreathingTraining.vue'),
+        children: [
+          {
+            path: 'basic',
+            name: 'BasicBreathing',
+            component: () => import('../views/meditation/breathing/BasicBreathing.vue')
+          },
+          {
+            path: 'relaxation',
+            name: 'RelaxationBreathing',
+            component: () => import('../views/meditation/breathing/RelaxationBreathing.vue')
+          },
+          {
+            path: 'focus',
+            name: 'FocusBreathing',
+            component: () => import('../views/meditation/breathing/FocusBreathing.vue')
+          }
+        ]
+      },
+      {
+        path: 'visualization',
+        name: 'VisualizationTraining',
+        component: () => import('../views/meditation/VisualizationTraining.vue')
+      },
+      {
+        path: 'mindfulness',
+        name: 'MindfulnessTraining',
+        component: () => import('../views/meditation/MindfulnessTraining.vue')
       }
     ]
   },
@@ -64,6 +128,11 @@ const routes = [
         path: 'schulte',
         name: 'Schulte',
         component: () => import('../views/basic/SchulteTable.vue')
+      },
+      {
+        path: 'quick-calculation',
+        name: 'QuickCalculation',
+        component: () => import('../views/basic/QuickCalculation.vue')
       }
     ]
   },
@@ -154,6 +223,7 @@ const routes = [
         name: 'InstantCalculation',
         component: () => import('../views/memory/InstantCalculation.vue')
       },
+  
       {
         path: 'progress',
         name: 'PhotoMemoryProgress',

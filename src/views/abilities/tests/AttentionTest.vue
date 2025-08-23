@@ -729,6 +729,7 @@ onUnmounted(() => {
 .attention-test {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 1.5rem;
 }
 
 .test-content {
@@ -1197,6 +1198,260 @@ onUnmounted(() => {
 .btn-primary:hover {
   background: var(--color-primary-dark);
   transform: translateY(-2px);
+}
+
+/* 大笔记本屏幕优化 (1367px - 1600px) */
+@media (min-width: 1367px) and (max-width: 1600px) {
+  .attention-test {
+    max-width: 1150px;
+    padding: 2rem;
+  }
+  
+  .test-content {
+    padding: 2rem;
+  }
+  
+  .test-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+  }
+  
+  .type-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 750px;
+  }
+  
+  .type-card {
+    padding: 1.5rem;
+  }
+  
+  .search-grid {
+    grid-template-columns: repeat(auto-fit, minmax(58px, 1fr));
+    gap: 0.5rem;
+    max-height: 500px;
+    padding: 1rem;
+  }
+  
+  .search-item {
+    width: 58px;
+    height: 58px;
+    font-size: 1.5rem;
+  }
+  
+  .selective-grid {
+    grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+    gap: 1rem;
+    max-height: 500px;
+    padding: 1rem;
+  }
+  
+  .selective-item {
+    width: 78px;
+    height: 78px;
+    font-size: 1.9rem;
+  }
+  
+  .stimulus-display {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .stimulus-symbol {
+    font-size: 4rem;
+  }
+  
+  .sustained-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .final-stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .stat-card {
+    padding: 1.5rem;
+  }
+  
+  .test-results-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .test-result-card {
+    padding: 1.5rem;
+  }
+}
+
+/* 中等笔记本屏幕优化 (1281px - 1366px) */
+@media (min-width: 1281px) and (max-width: 1366px) {
+  .attention-test {
+    max-width: 1100px;
+    padding: 1.8rem;
+  }
+  
+  .test-content {
+    padding: 1.8rem;
+  }
+  
+  .test-header {
+    margin-bottom: 1.8rem;
+    padding-bottom: 0.8rem;
+  }
+  
+  .type-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+    max-width: 700px;
+  }
+  
+  .type-card {
+    padding: 1.2rem;
+  }
+  
+  .search-grid {
+    grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
+    gap: 0.4rem;
+    max-height: 450px;
+    padding: 0.8rem;
+  }
+  
+  .search-item {
+    width: 55px;
+    height: 55px;
+    font-size: 1.4rem;
+  }
+  
+  .selective-grid {
+    grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+    gap: 0.8rem;
+    max-height: 450px;
+    padding: 0.8rem;
+  }
+  
+  .selective-item {
+    width: 75px;
+    height: 75px;
+    font-size: 1.8rem;
+  }
+  
+  .stimulus-display {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .stimulus-symbol {
+    font-size: 3.5rem;
+  }
+  
+  .sustained-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+  }
+  
+  .final-stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+  }
+  
+  .stat-card {
+    padding: 1.2rem;
+  }
+  
+  .test-results-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .test-result-card {
+    padding: 1.2rem;
+  }
+}
+
+/* 小笔记本屏幕优化 (1024px - 1280px) */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .attention-test {
+    max-width: 1000px;
+    padding: 1.5rem;
+  }
+  
+  .test-content {
+    padding: 1.5rem;
+  }
+  
+  .test-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.6rem;
+  }
+  
+  .type-grid {
+    max-width: 650px;
+    gap: 1rem;
+  }
+  
+  .type-card {
+    padding: 1rem;
+  }
+  
+  .search-grid {
+    grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+    gap: 0.3rem;
+    max-height: 380px;
+    padding: 0.6rem;
+  }
+  
+  .search-item {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+  }
+  
+  .selective-grid {
+    grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+    gap: 0.6rem;
+    max-height: 380px;
+    padding: 0.6rem;
+  }
+  
+  .selective-item {
+    width: 68px;
+    height: 68px;
+    font-size: 1.6rem;
+  }
+  
+  .stimulus-display {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .stimulus-symbol {
+    font-size: 3rem;
+  }
+  
+  .sustained-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  
+  .final-stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .test-results-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  
+  .test-result-card {
+    padding: 1rem;
+  }
 }
 
 /* 响应式设计 */

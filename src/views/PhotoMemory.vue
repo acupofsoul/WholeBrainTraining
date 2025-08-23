@@ -1,16 +1,13 @@
 <template>
   <div class="photo-memory-container">
     <!-- 面包屑导航 -->
-    <div class="breadcrumb-nav" v-if="$route.path !== '/photographic-memory'">
-      <button class="back-btn" @click="goBack">
-        <span class="back-arrow">←</span>
-        返回
-      </button>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-item">照相记忆训练</span>
-      <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-current">{{ getModuleTitle($route.path) }}</span>
-    </div>
+    <BreadcrumbDropdown 
+      v-if="$route.path !== '/photographic-memory'"
+      :main-title="'照相记忆训练'"
+      :main-path="'/photographic-memory'"
+      :current-title="getModuleTitle($route.path)"
+      :sibling-modules="siblingModules"
+    />
 
     <!-- 主页面内容 -->
     <div v-if="$route.path === '/photographic-memory'">
@@ -88,6 +85,8 @@
           <span>准确率：{{ calcStats.accuracy }}%</span>
         </div>
       </div>
+
+
 
       <div class="module-card progress-card" @click="navigateTo('progress')">
         <div class="module-icon">📊</div>
@@ -236,7 +235,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useTrainingStore } from '../stores';
-
+import BreadcrumbDropdown from '../components/BreadcrumbDropdown.vue';
 import photoMemoryStorage from '../services/photoMemoryStorage.js';
 
 const router = useRouter();
@@ -250,6 +249,7 @@ const cardStats = ref({ accuracy: 0, bestScore: 0 });
 const imageStats = ref({ memorized: 0, recognition: 0 });
 const memoryStats = ref({ overallScore: 0, completed: 0 });
 const calcStats = ref({ speed: 0, accuracy: 0 });
+
 
 // 总体统计
 const overallProgress = ref(0);
@@ -267,8 +267,21 @@ const moduleTitles = {
   '/photographic-memory/thousand-images': '1000图训练',
   '/photographic-memory/memory-training': '记忆训练',
   '/photographic-memory/instant-calculation': '瞬时计算',
+
   '/photographic-memory/progress': '训练进度分析'
 };
+
+// 同级模块列表
+const siblingModules = [
+  { path: '/photographic-memory/afterimage', title: '残像训练' },
+  { path: '/photographic-memory/color-perception', title: '颜色感知训练' },
+  { path: '/photographic-memory/3d-cards', title: '3D卡片训练' },
+  { path: '/photographic-memory/thousand-images', title: '1000图训练' },
+  { path: '/photographic-memory/memory-training', title: '记忆训练' },
+  { path: '/photographic-memory/instant-calculation', title: '瞬时计算' },
+
+  { path: '/photographic-memory/progress', title: '训练进度分析' }
+];
 
 // 导航到指定模块
 const navigateTo = (module) => {
@@ -353,6 +366,8 @@ const loadTrainingData = () => {
     accuracy: photoData.instantCalculation?.averageAccuracy || 0
   };
   
+
+  
   // 总体统计
   overallProgress.value = photoData.overall?.overallProgress || 0;
   totalSessions.value = photoData.overall?.totalSessions || 0;
@@ -376,79 +391,31 @@ onMounted(() => {
   padding: 2rem;
 }
 
-/* 面包屑导航样式 */
+/* 面包屑导航样式 - 菜单栏下方小字显示 */
 .breadcrumb-nav {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-  padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-.breadcrumb-nav::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
-}
-
-.back-btn {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.breadcrumb-item {
+  color: var(--color-text-secondary);
   cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: bold;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  position: relative;
-  overflow: hidden;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.back-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
+.breadcrumb-item:hover {
+  color: var(--color-primary);
 }
 
-.back-btn:hover::before {
-  left: 100%;
-}
 
-.back-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-}
-
-.back-btn:active {
-  transform: translateY(0);
-}
-
-.back-arrow {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
 
 .breadcrumb-separator {
   color: #94a3b8;
@@ -575,6 +542,44 @@ onMounted(() => {
 .module-level.special {
   background: rgba(var(--color-info-rgb), 0.1);
   color: var(--color-info);
+}
+
+.module-card.kids-special {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+  border: 3px solid #fdcb6e;
+  position: relative;
+  overflow: hidden;
+}
+
+.module-card.kids-special::before {
+  content: '🎮';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  opacity: 0.3;
+}
+
+.module-card.kids-special:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(253, 203, 110, 0.4);
+}
+
+.module-card.kids-special .module-icon {
+  font-size: 3.5rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
 }
 
 .progress-card {
@@ -803,6 +808,14 @@ onMounted(() => {
 @media (max-width: 768px) {
   .photo-memory-container {
     padding: 1rem;
+  }
+  
+  .breadcrumb-nav {
+    font-size: 0.75rem;
+  }
+  
+  .back-btn {
+    font-size: 0.75rem;
   }
   
   .page-header h1 {

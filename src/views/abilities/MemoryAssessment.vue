@@ -8,86 +8,36 @@
           全面评估您的记忆能力，包括数字记忆、图像记忆、单词记忆和序列记忆等多个维度。
         </p>
         
-        <div class="assessment-modules">
-          <h3>测评模块</h3>
-          <div class="modules-grid">
-            <div 
-              v-for="module in availableModules" 
-              :key="module.key"
-              :class="['module-card', { 'selected': selectedModules.includes(module.key) }]"
-              @click="toggleModule(module.key)"
-            >
-              <div class="module-icon">{{ module.icon }}</div>
-              <div class="module-info">
-                <h4>{{ module.name }}</h4>
-                <p>{{ module.description }}</p>
-                <div class="module-stats">
-                  <span>题目数: {{ module.questionCount }}</span>
-                  <span>预计时长: {{ module.duration }}分钟</span>
-                </div>
-              </div>
-              <div class="module-checkbox">
-                <div :class="['checkbox', { 'checked': selectedModules.includes(module.key) }]">
-                  ✓
-                </div>
-              </div>
-            </div>
+        <!-- 快速设置预览 -->
+        <div class="quick-settings-preview">
+          <div class="preview-item">
+            <span class="preview-label">已选模块:</span>
+            <span class="preview-value">{{ selectedModulesText }}</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-label">难度等级:</span>
+            <span class="preview-value">{{ difficultyText }}</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-label">预计时长:</span>
+            <span class="preview-value">{{ estimatedDuration }}分钟</span>
           </div>
         </div>
         
-        <div class="assessment-settings">
-          <h3>测评设置</h3>
-          <div class="settings-grid">
-            <div class="setting-group">
-              <label>难度等级</label>
-              <select v-model="selectedDifficulty">
-                <option value="easy">简单</option>
-                <option value="medium">中等</option>
-                <option value="hard">困难</option>
-                <option value="adaptive">自适应</option>
-              </select>
-            </div>
+        <!-- 设置按钮 -->
+        <div class="settings-actions">
+          <SettingsButton 
+            text="配置测评参数"
+            @click="openSettings"
+          />
+        </div>
             
-            <div class="setting-group">
-              <label>测评模式</label>
-              <select v-model="assessmentMode">
-                <option value="comprehensive">综合测评</option>
-                <option value="quick">快速测评</option>
-                <option value="detailed">详细测评</option>
-              </select>
-            </div>
-            
-            <div class="setting-group">
-              <label>个性化设置</label>
-              <div class="checkbox-group">
-                <label class="checkbox-item">
-                  <input type="checkbox" v-model="enableHints">
-                  <span>启用提示功能</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" v-model="enableFeedback">
-                  <span>即时反馈</span>
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" v-model="enableProgress">
-                  <span>显示进度</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
         
-        <div class="estimated-time">
-          <div class="time-info">
-            <span class="time-icon">⏱️</span>
-            <span class="time-text">预计总时长: {{ estimatedTotalTime }}分钟</span>
-          </div>
-        </div>
-        
+        <!-- 开始按钮 -->
         <div class="setup-actions">
           <button 
             @click="startAssessment" 
-            :disabled="selectedModules.length === 0"
+            :disabled="!canStartAssessment"
             class="btn-start"
           >
             开始测评
@@ -95,6 +45,20 @@
         </div>
       </div>
     </div>
+    
+    <!-- 设置弹窗 -->
+    <SettingsModal
+      v-if="showSettingsModal"
+      :visible="showSettingsModal"
+      title="记忆能力测评设置"
+      :settings="settings"
+      :available-modules="availableModules"
+      :difficulty-levels="difficultyLevels"
+      :assessment-modes="assessmentModes"
+      @close="closeSettings"
+      @save="saveSettings"
+      @reset="resetSettings"
+    />
     
     <!-- 测评进行阶段 -->
     <div v-if="currentPhase === 'testing'" class="testing-phase">
@@ -108,18 +72,18 @@
                 :style="{ width: overallProgress + '%' }"
               ></div>
             </div>
-            <span class="progress-text">{{ currentModuleIndex + 1 }} / {{ selectedModules.length }}</span>
+            <span class="progress-text">{{ currentModuleIndex + 1 }} / {{ settings.selectedModules?.length || 0 }}</span>
           </div>
         </div>
         
         <div class="current-module-info">
           <div class="module-name">
-            <span class="module-icon">{{ getCurrentModule()?.icon }}</span>
-            <span>{{ getCurrentModule()?.name }}</span>
+            <span class="module-icon">{{ currentModuleInfo?.icon }}</span>
+            <span>{{ currentModuleInfo?.name }}</span>
           </div>
-          <div class="timer" v-if="enableProgress">
+          <div class="timer" v-if="settings.enableProgress">
             <span class="timer-icon">⏱️</span>
-            <span>{{ formatTime(elapsedTime) }}</span>
+            <span>{{ formatTime(totalElapsedTime) }}</span>
           </div>
         </div>
       </div>
@@ -350,28 +314,40 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useAbilityTestSettings } from '@/composables/useAbilityTestSettings'
+// import { useAbilityTestStore } from '@/stores/abilityTestStore' // 暂时移除，使用localStorage代替
+import { useRouter } from 'vue-router'
 import NumberMemoryTest from './tests/NumberMemoryTest.vue'
 import ImageMemoryTest from './tests/ImageMemoryTest.vue'
 import WordMemoryTest from './tests/WordMemoryTest.vue'
 import SequenceMemoryTest from './tests/SequenceMemoryTest.vue'
+import SettingsModal from '@/components/SettingsModal.vue'
+import SettingsButton from '@/components/SettingsButton.vue'
+
+// 路由和存储
+const router = useRouter()
+// const abilityTestStore = useAbilityTestStore() // 暂时移除
+
+// 设置管理
+const {
+  settings,
+  showSettingsModal,
+  openSettings,
+  closeSettings,
+  saveSettings,
+  resetSettings
+} = useAbilityTestSettings('memory')
 
 // 响应式数据
 const currentPhase = ref('setup') // setup, testing, results
-const selectedModules = ref(['number', 'image', 'word', 'sequence'])
-const selectedDifficulty = ref('medium')
-const assessmentMode = ref('comprehensive')
-const enableHints = ref(true)
-const enableFeedback = ref(true)
-const enableProgress = ref(true)
 const currentModuleIndex = ref(0)
 const moduleResults = ref([])
-const startTime = ref(null)
-const completionTime = ref(null)
-const elapsedTime = ref(0)
-const timer = ref(null)
+const totalElapsedTime = ref(0)
+const testTimer = ref(null)
 const showQuestionDetails = ref(false)
 const activeDetailTab = ref('')
+const testSettings = ref({})
 
 // 可用模块定义
 const availableModules = [
@@ -421,28 +397,112 @@ const memoryAbilities = ref([
   { key: 'sequence', name: '序列记忆', score: 0, color: '#dc3545' }
 ])
 
+// 难度等级定义
+const difficultyLevels = [
+  { value: 'easy', label: '简单', description: '适合初学者' },
+  { value: 'medium', label: '中等', description: '适合有一定基础的用户' },
+  { value: 'hard', label: '困难', description: '适合高级用户挑战' }
+]
+
+// 测评模式定义
+const assessmentModes = [
+  { value: 'comprehensive', label: '综合测评', description: '全面评估记忆能力' },
+  { value: 'quick', label: '快速测评', description: '快速了解记忆水平' },
+  { value: 'detailed', label: '详细测评', description: '深入分析记忆表现' }
+]
+
 // 计算属性
-const estimatedTotalTime = computed(() => {
-  return selectedModules.value.reduce((total, moduleKey) => {
+const selectedModulesText = computed(() => {
+  if (!settings.value.selectedModules?.length) return '未选择'
+  return settings.value.selectedModules.map(key => {
+    const module = availableModules.find(m => m.key === key)
+    return module?.name || key
+  }).join('、')
+})
+
+const difficultyText = computed(() => {
+  const difficulty = difficultyLevels.find(d => d.value === settings.value.difficulty)
+  return difficulty?.label || '中等'
+})
+
+const estimatedDuration = computed(() => {
+  if (!settings.value.selectedModules?.length) return 0
+  return settings.value.selectedModules.reduce((total, moduleKey) => {
     const module = availableModules.find(m => m.key === moduleKey)
     return total + (module?.duration || 0)
   }, 0)
 })
 
+const canStartAssessment = computed(() => {
+  return settings.value.selectedModules?.length > 0
+})
+
 const overallProgress = computed(() => {
-  if (selectedModules.value.length === 0) return 0
-  return (currentModuleIndex.value / selectedModules.value.length) * 100
+  if (!settings.value.selectedModules?.length) return 0
+  return (currentModuleIndex.value / settings.value.selectedModules.length) * 100
+})
+
+const currentModuleInfo = computed(() => {
+  if (currentModuleIndex.value >= settings.value.selectedModules?.length) return null
+  const moduleKey = settings.value.selectedModules[currentModuleIndex.value]
+  return availableModules.find(m => m.key === moduleKey)
 })
 
 const currentTestComponent = computed(() => {
-  const currentModule = getCurrentModule()
   const componentMap = {
     'number': NumberMemoryTest,
     'image': ImageMemoryTest,
     'word': WordMemoryTest,
     'sequence': SequenceMemoryTest
   }
-  return componentMap[currentModule?.key] || null
+  return componentMap[currentModuleInfo.value?.key] || null
+})
+
+// 记忆能力分数计算
+const numberMemoryScore = computed(() => {
+  const result = moduleResults.value.find(r => r.moduleKey === 'number')
+  return result?.score || 0
+})
+
+const imageMemoryScore = computed(() => {
+  const result = moduleResults.value.find(r => r.moduleKey === 'image')
+  return result?.score || 0
+})
+
+const wordMemoryScore = computed(() => {
+  const result = moduleResults.value.find(r => r.moduleKey === 'word')
+  return result?.score || 0
+})
+
+const sequenceMemoryScore = computed(() => {
+  const result = moduleResults.value.find(r => r.moduleKey === 'sequence')
+  return result?.score || 0
+})
+
+const abilityScores = computed(() => [
+  { name: '数字记忆', score: numberMemoryScore.value, color: '#007bff' },
+  { name: '图像记忆', score: imageMemoryScore.value, color: '#28a745' },
+  { name: '单词记忆', score: wordMemoryScore.value, color: '#ffc107' },
+  { name: '序列记忆', score: sequenceMemoryScore.value, color: '#dc3545' }
+])
+
+const totalQuestions = computed(() => {
+  return moduleResults.value.reduce((total, result) => total + (result.totalQuestions || 0), 0)
+})
+
+const correctAnswers = computed(() => {
+  return moduleResults.value.reduce((total, result) => total + (result.correctAnswers || 0), 0)
+})
+
+const overallAccuracy = computed(() => {
+  if (totalQuestions.value === 0) return 0
+  return Math.round((correctAnswers.value / totalQuestions.value) * 100)
+})
+
+const averageReactionTime = computed(() => {
+  if (moduleResults.value.length === 0) return 0
+  const totalTime = moduleResults.value.reduce((total, result) => total + (result.averageTime || 0), 0)
+  return Math.round(totalTime / moduleResults.value.length)
 })
 
 const overallScore = computed(() => {
@@ -504,53 +564,56 @@ const improvementSuggestions = computed(() => {
 })
 
 // 方法
-const toggleModule = (moduleKey) => {
-  const index = selectedModules.value.indexOf(moduleKey)
-  if (index > -1) {
-    selectedModules.value.splice(index, 1)
-  } else {
-    selectedModules.value.push(moduleKey)
+const startAssessment = () => {
+  if (!canStartAssessment.value) return
+  
+  currentPhase.value = 'testing'
+  currentModuleIndex.value = 0
+  moduleResults.value = []
+  totalElapsedTime.value = 0
+  
+  // 准备测试设置
+  testSettings.value = {
+    difficulty: settings.value.difficulty,
+    mode: settings.value.mode,
+    enableHints: settings.value.enableHints,
+    enableFeedback: settings.value.enableFeedback,
+    enableProgress: settings.value.enableProgress
+  }
+  
+  startTimer()
+}
+
+const startTimer = () => {
+  const startTime = Date.now()
+  testTimer.value = setInterval(() => {
+    totalElapsedTime.value = Math.floor((Date.now() - startTime) / 1000)
+  }, 1000)
+}
+
+const stopTimer = () => {
+  if (testTimer.value) {
+    clearInterval(testTimer.value)
+    testTimer.value = null
   }
 }
 
 const getCurrentModule = () => {
-  if (currentModuleIndex.value >= selectedModules.value.length) return null
-  const moduleKey = selectedModules.value[currentModuleIndex.value]
-  return availableModules.find(m => m.key === moduleKey)
-}
-
-const startAssessment = () => {
-  currentPhase.value = 'testing'
-  currentModuleIndex.value = 0
-  moduleResults.value = []
-  startTime.value = Date.now()
-  elapsedTime.value = 0
-  
-  // 开始计时
-  timer.value = setInterval(() => {
-    elapsedTime.value = Math.floor((Date.now() - startTime.value) / 1000)
-  }, 1000)
+  return currentModuleInfo.value
 }
 
 const handleTestComplete = (result) => {
   // 保存当前模块结果
+  const moduleKey = settings.value.selectedModules[currentModuleIndex.value]
   moduleResults.value.push({
-    moduleKey: selectedModules.value[currentModuleIndex.value],
+    moduleKey,
     ...result
   })
   
-  // 更新能力雷达图数据
-  const abilityIndex = memoryAbilities.value.findIndex(
-    ability => ability.key === selectedModules.value[currentModuleIndex.value]
-  )
-  if (abilityIndex > -1) {
-    memoryAbilities.value[abilityIndex].score = result.score
-  }
-  
   // 进入下一个模块或完成测评
   currentModuleIndex.value++
-  if (currentModuleIndex.value >= selectedModules.value.length) {
-    completeAssessment()
+  if (currentModuleIndex.value >= settings.value.selectedModules.length) {
+    finishAssessment()
   }
 }
 
@@ -559,13 +622,25 @@ const handleTestProgress = (progress) => {
   console.log('Test progress:', progress)
 }
 
-const completeAssessment = () => {
+const finishAssessment = () => {
   currentPhase.value = 'results'
-  completionTime.value = new Date()
+  stopTimer()
   
-  if (timer.value) {
-    clearInterval(timer.value)
+  // 保存结果到store
+  const assessmentResult = {
+    type: 'memory',
+    timestamp: new Date().toISOString(),
+    settings: { ...testSettings.value },
+    results: moduleResults.value,
+    overallScore: overallScore.value,
+    totalTime: totalElapsedTime.value,
+    abilityScores: abilityScores.value
   }
+  
+  // 使用localStorage保存测评结果
+  const savedResults = JSON.parse(localStorage.getItem('memoryAssessmentResults') || '[]')
+  savedResults.push(assessmentResult)
+  localStorage.setItem('memoryAssessmentResults', JSON.stringify(savedResults))
   
   // 设置默认详情标签
   if (moduleResults.value.length > 0) {
@@ -613,38 +688,51 @@ const getPerformanceLabel = (score) => {
   return '较差'
 }
 
-const formatTime = (seconds) => {
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
-}
-
 const formatDate = (date) => {
   if (!date) return ''
   return date.toLocaleString('zh-CN')
 }
 
+const restartAssessment = () => {
+  currentPhase.value = 'setup'
+  currentModuleIndex.value = 0
+  moduleResults.value = []
+  totalElapsedTime.value = 0
+  showQuestionDetails.value = false
+  stopTimer()
+}
+
 const exportReport = () => {
   // 导出测评报告逻辑
+  const reportData = {
+    type: 'memory-assessment',
+    timestamp: new Date().toISOString(),
+    overallScore: overallScore.value,
+    moduleResults: moduleResults.value,
+    settings: testSettings.value
+  }
+  
+  const dataStr = JSON.stringify(reportData, null, 2)
+  const dataBlob = new Blob([dataStr], { type: 'application/json' })
+  const url = URL.createObjectURL(dataBlob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `记忆能力测评报告_${new Date().toLocaleDateString()}.json`
+  link.click()
+  URL.revokeObjectURL(url)
   console.log('导出记忆能力测评报告')
 }
 
 const retakeAssessment = () => {
-  currentPhase.value = 'setup'
-  currentModuleIndex.value = 0
-  moduleResults.value = []
-  elapsedTime.value = 0
-  showQuestionDetails.value = false
-  
-  // 重置能力雷达图数据
-  memoryAbilities.value.forEach(ability => {
-    ability.score = 0
-  })
+  restartAssessment()
 }
 
 const goToTraining = () => {
-  // 跳转到训练页面逻辑
-  console.log('跳转到记忆训练')
+  router.push('/training/memory')
+}
+
+const goHome = () => {
+  router.push('/abilities')
 }
 
 const toggleQuestionDetails = () => {
@@ -656,10 +744,44 @@ const handleSuggestionAction = (action) => {
   console.log('执行建议操作:', action)
 }
 
+const getOverallEvaluation = () => {
+  const score = overallScore.value
+  if (score >= 90) return '您的记忆能力非常出色，继续保持！'
+  if (score >= 80) return '您的记忆能力表现良好，可以尝试更高难度的挑战。'
+  if (score >= 70) return '您的记忆能力处于平均水平，通过训练可以进一步提升。'
+  if (score >= 60) return '您的记忆能力有提升空间，建议进行系统性训练。'
+  return '建议从基础记忆训练开始，循序渐进地提升能力。'
+}
+
+const getImprovementSuggestions = () => {
+  const suggestions = []
+  
+  if (numberMemoryScore.value < 70) {
+    suggestions.push('加强数字记忆训练，可以尝试记忆电话号码、日期等')
+  }
+  if (imageMemoryScore.value < 70) {
+    suggestions.push('提升图像记忆能力，可以练习观察和回忆图片细节')
+  }
+  if (wordMemoryScore.value < 70) {
+    suggestions.push('增强词汇记忆，可以通过阅读和词汇练习来改善')
+  }
+  if (sequenceMemoryScore.value < 70) {
+    suggestions.push('训练序列记忆，可以练习记忆数字序列、字母序列等')
+  }
+  
+  return suggestions
+}
+
 // 生命周期
 onMounted(() => {
   // 组件挂载时的初始化
 })
+
+onUnmounted(() => {
+  stopTimer()
+})
+
+// 在 <script setup> 中，所有的变量和函数都会自动暴露给模板，无需 return 语句
 </script>
 
 <style scoped>

@@ -910,8 +910,8 @@ export default {
   background: white;
   border-radius: 20px;
   padding: 40px;
-  max-width: 1000px;
-  width: 100%;
+  max-width: 1400px;
+  width: 90%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
@@ -945,8 +945,8 @@ export default {
 
 .module-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
 }
 
 .module-card {

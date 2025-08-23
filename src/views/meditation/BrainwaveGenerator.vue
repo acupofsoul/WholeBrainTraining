@@ -404,6 +404,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useTrainingStore } from '../../stores';
+import { audioEngine, audioUtils } from '../../utils/audioUtils';
 
 const emit = defineEmits(['back']);
 
@@ -417,13 +418,13 @@ const volume = ref(70);
 const sessionDuration = ref(20);
 const timeRemaining = ref(0);
 const averageFrequency = ref(0);
+const audioInitialized = ref(false);
+const audioError = ref('');
 
 // 可视化
 const visualizerCanvas = ref(null);
 let animationId = null;
-let audioContext = null;
-let oscillator = null;
-let gainNode = null;
+let currentAudioNodes = null;
 
 // 设置
 const settings = ref({
@@ -747,14 +748,18 @@ const togglePlayPause = () => {
   }
 };
 
-const startSession = () => {
+const startSession = async () => {
   isPlaying.value = true;
   timeRemaining.value = sessionDuration.value * 60;
   currentFrequency.value = currentWave.value.minFreq + (currentWave.value.maxFreq - currentWave.value.minFreq) / 2;
   
-  initAudioContext();
-  startVisualization();
-  startTimer();
+  await initAudioContext();
+  if (audioInitialized.value) {
+    startVisualization();
+    startTimer();
+  } else {
+    isPlaying.value = false;
+  }
 };
 
 const stopSession = () => {
@@ -764,102 +769,73 @@ const stopSession = () => {
   stopTimer();
 };
 
-const initAudioContext = () => {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  
-  if (oscillator) {
-    oscillator.disconnect();
-  }
-  
-  // 创建双耳节拍或载波频率音频
-  if (settings.value.binauralBeats && settings.value.mode === 'binaural') {
-    // 双耳节拍模式：左耳载波频率，右耳载波频率+脑波频率
-    const leftOscillator = audioContext.createOscillator();
-    const rightOscillator = audioContext.createOscillator();
-    const leftGain = audioContext.createGain();
-    const rightGain = audioContext.createGain();
-    const merger = audioContext.createChannelMerger(2);
+const initAudioContext = async () => {
+  try {
+    audioInitialized.value = false;
+    audioError.value = null;
     
-    leftOscillator.connect(leftGain);
-    rightOscillator.connect(rightGain);
-    leftGain.connect(merger, 0, 0);
-    rightGain.connect(merger, 0, 1);
-    merger.connect(audioContext.destination);
+    await audioEngine.initialize();
     
-    leftOscillator.frequency.setValueAtTime(settings.value.carrierFreq, audioContext.currentTime);
-    rightOscillator.frequency.setValueAtTime(settings.value.carrierFreq + currentFrequency.value, audioContext.currentTime);
+    if (settings.value.binauralBeats && settings.value.mode === 'binaural') {
+      currentAudioNodes.value = await audioEngine.createBinauralBeats(
+        settings.value.carrierFreq,
+        currentFrequency.value,
+        volume.value / 100
+      );
+    } else {
+      currentAudioNodes.value = await audioEngine.createTone(
+        settings.value.carrierFreq + currentFrequency.value,
+        volume.value / 100
+      );
+    }
     
-    const gainValue = volume.value / 100 * 0.1;
-    leftGain.gain.setValueAtTime(gainValue, audioContext.currentTime);
-    rightGain.gain.setValueAtTime(gainValue, audioContext.currentTime);
-    
-    leftOscillator.start();
-    rightOscillator.start();
-    
-    // 保存引用以便后续控制
-    oscillator = { left: leftOscillator, right: rightOscillator };
-    gainNode = { left: leftGain, right: rightGain };
-  } else {
-    // 单声道模式：使用载波频率调制脑波频率
-    oscillator = audioContext.createOscillator();
-    gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    // 使用载波频率而不是直接使用脑波频率
-    const audibleFreq = settings.value.carrierFreq + currentFrequency.value;
-    oscillator.frequency.setValueAtTime(audibleFreq, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(volume.value / 100 * 0.1, audioContext.currentTime);
-    
-    oscillator.start();
+    audioInitialized.value = true;
+  } catch (error) {
+    console.error('音频初始化失败:', error);
+    audioError.value = error.message;
   }
 };
 
 const stopAudioContext = () => {
-  if (oscillator) {
-    if (oscillator.left && oscillator.right) {
-      // 双耳节拍模式
-      oscillator.left.stop();
-      oscillator.right.stop();
-      oscillator.left.disconnect();
-      oscillator.right.disconnect();
-    } else {
-      // 单声道模式
-      oscillator.stop();
-      oscillator.disconnect();
+  try {
+    if (currentAudioNodes.value) {
+      audioEngine.stopAudio(currentAudioNodes.value);
+      currentAudioNodes.value = null;
     }
-    oscillator = null;
+    audioInitialized.value = false;
+  } catch (error) {
+    console.error('停止音频失败:', error);
   }
 };
 
 const updateFrequency = () => {
-  if (oscillator && audioContext) {
-    if (oscillator.left && oscillator.right) {
-      // 双耳节拍模式
-      oscillator.left.frequency.setValueAtTime(settings.value.carrierFreq, audioContext.currentTime);
-      oscillator.right.frequency.setValueAtTime(settings.value.carrierFreq + currentFrequency.value, audioContext.currentTime);
-    } else {
-      // 单声道模式
-      const audibleFreq = settings.value.carrierFreq + currentFrequency.value;
-      oscillator.frequency.setValueAtTime(audibleFreq, audioContext.currentTime);
+  try {
+    if (currentAudioNodes.value && audioInitialized.value) {
+      if (settings.value.binauralBeats && settings.value.mode === 'binaural') {
+        audioEngine.updateBinauralFrequency(
+          currentAudioNodes.value,
+          settings.value.carrierFreq,
+          currentFrequency.value
+        );
+      } else {
+        audioEngine.updateFrequency(
+          currentAudioNodes.value,
+          settings.value.carrierFreq + currentFrequency.value
+        );
+      }
     }
+  } catch (error) {
+    console.error('更新频率失败:', error);
   }
 };
 
 const updateVolume = () => {
-  if (gainNode && audioContext) {
-    const gainValue = volume.value / 100 * 0.1;
-    if (gainNode.left && gainNode.right) {
-      // 双耳节拍模式
-      gainNode.left.gain.setValueAtTime(gainValue, audioContext.currentTime);
-      gainNode.right.gain.setValueAtTime(gainValue, audioContext.currentTime);
-    } else {
-      // 单声道模式
-      gainNode.gain.setValueAtTime(gainValue, audioContext.currentTime);
+  try {
+    if (currentAudioNodes.value && audioInitialized.value) {
+      audioEngine.updateVolume(currentAudioNodes.value, volume.value / 100);
     }
+  } catch (error) {
+    console.error('更新音量失败:', error);
   }
 };
 
@@ -946,16 +922,15 @@ const completeSession = () => {
   showSessionComplete.value = true;
 };
 
-const selectWave = (index) => {
+const selectWave = async (index) => {
   currentWaveIndex.value = index;
   const wave = brainwaves.value[index];
   currentFrequency.value = wave.minFreq + (wave.maxFreq - wave.minFreq) / 2;
   
   if (isPlaying.value) {
     stopSession();
-    nextTick(() => {
-      startSession();
-    });
+    await nextTick();
+    await startSession();
   }
 };
 

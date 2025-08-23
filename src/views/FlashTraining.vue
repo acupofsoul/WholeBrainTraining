@@ -1,14 +1,13 @@
 <template>
   <div class="flash-training-container">
     <!-- 面包屑导航 -->
-    <div class="breadcrumb-nav" v-if="$route.path !== '/flash-training'">
-      <span class="breadcrumb-item" @click="goBack">
-        <span class="back-arrow">←</span>
-        闪视训练
-      </span>
-      <span class="breadcrumb-separator">></span>
-      <span class="breadcrumb-current">{{ getModuleTitle($route.path) }}</span>
-    </div>
+    <BreadcrumbDropdown 
+      v-if="$route.path !== '/flash-training'"
+      :main-title="'闪视训练'"
+      :main-path="'/flash-training'"
+      :current-title="getModuleTitle($route.path)"
+      :sibling-modules="siblingModules"
+    />
 
     <!-- 主页面内容 -->
     <div v-if="$route.path === '/flash-training'">
@@ -203,6 +202,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useTrainingStore } from '../stores';
+import BreadcrumbDropdown from '../components/BreadcrumbDropdown.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -216,6 +216,15 @@ const moduleTitles = {
   '/flash-training/custom-word-flash': '自定义单词闪视',
   '/flash-training/custom-image-flash': '自定义图片闪视'
 };
+
+// 同级模块列表
+const siblingModules = [
+  { path: '/flash-training/basic-flash', title: '基本闪视训练' },
+  { path: '/flash-training/article-flash', title: '文章闪视训练' },
+  { path: '/flash-training/image-flash', title: '图像闪视训练' },
+  { path: '/flash-training/custom-word-flash', title: '自定义单词闪视' },
+  { path: '/flash-training/custom-image-flash', title: '自定义图片闪视' }
+];
 
 // 获取模块标题
 const getModuleTitle = (path) => {
@@ -320,57 +329,40 @@ onMounted(() => {
 
 <style scoped>
 .flash-training-container {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 2rem;
+  width: 90%;
 }
 
-/* 面包屑导航样式 - 紧凑设计 */
+/* 面包屑导航样式 - 菜单栏下方小字显示 */
 .breadcrumb-nav {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 0;
   margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
-  background: rgba(248, 250, 252, 0.8);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(226, 232, 240, 0.6);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
 }
 
 .breadcrumb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: #3b82f6;
-  color: white;
+  color: var(--color-text-secondary);
   cursor: pointer;
   font-size: 0.8rem;
-  font-weight: 500;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .breadcrumb-item:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
-}
-
-.back-arrow {
-  font-size: 0.9rem;
-  font-weight: bold;
+  color: var(--color-primary);
 }
 
 .breadcrumb-separator {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  opacity: 0.6;
-  margin: 0 0.1rem;
+  color: #666;
+  font-size: 0.8rem;
+  margin: 0;
 }
 
 .breadcrumb-current {
@@ -409,8 +401,8 @@ onMounted(() => {
 
 .training-modules {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
   margin-bottom: 3rem;
 }
 
@@ -702,6 +694,14 @@ onMounted(() => {
 @media (max-width: 768px) {
   .flash-training-container {
     padding: 1rem;
+  }
+  
+  .breadcrumb-nav {
+    font-size: 0.75rem;
+  }
+  
+  .breadcrumb-item {
+    font-size: 0.75rem;
   }
   
   .page-header h1 {

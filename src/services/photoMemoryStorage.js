@@ -12,6 +12,7 @@ class PhotoMemoryStorage {
       thousandImages: 'photo-memory-thousand-images',
       memoryTraining: 'photo-memory-memory-training',
       instantCalculation: 'photo-memory-instant-calculation',
+
       overall: 'photo-memory-overall'
     };
   }
@@ -104,7 +105,8 @@ class PhotoMemoryStorage {
           lightning: { completed: 0, accuracy: 0 }
         },
         maxDigits: 2
-      }
+      },
+
     };
 
     return moduleSpecificStats[module] || baseStats;
@@ -250,6 +252,8 @@ class PhotoMemoryStorage {
           }
         }
         break;
+
+
     }
   }
 

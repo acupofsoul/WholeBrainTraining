@@ -1949,6 +1949,7 @@ export default {
   background: #ddd;
   outline: none;
   -webkit-appearance: none;
+  appearance: none;
   padding: 0;
   margin: 5px 0;
 }

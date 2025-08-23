@@ -296,6 +296,29 @@ const timer = ref(null);
 const clickMarks = ref([]);
 const searchAreaSize = ref({ width: 800, height: 600 });
 
+// 响应式搜索区域大小
+const updateSearchAreaSize = () => {
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  
+  if (screenWidth >= 1367 && screenWidth <= 1600) {
+    // 大笔记本屏幕 (1367px - 1600px)
+    searchAreaSize.value = { width: 750, height: 550 };
+  } else if (screenWidth >= 1281 && screenWidth <= 1366) {
+    // 中等笔记本屏幕 (1281px - 1366px)
+    searchAreaSize.value = { width: 700, height: 500 };
+  } else if (screenWidth >= 1024 && screenWidth <= 1280) {
+    // 小笔记本屏幕 (1024px - 1280px)
+    searchAreaSize.value = { width: 650, height: 450 };
+  } else if (screenWidth <= 768) {
+    // 平板和手机
+    searchAreaSize.value = { width: Math.min(screenWidth - 40, 600), height: 400 };
+  } else {
+    // 默认桌面尺寸
+    searchAreaSize.value = { width: 800, height: 600 };
+  }
+};
+
 // 计算属性
 const currentQuestion = computed(() => questions.value[currentQuestionIndex.value]);
 
@@ -674,13 +697,20 @@ watch(() => props.testData, () => {
 
 // 生命周期
 onMounted(() => {
-  // 初始化
+  // 初始化搜索区域大小
+  updateSearchAreaSize();
+  
+  // 监听窗口大小变化
+  window.addEventListener('resize', updateSearchAreaSize);
 });
 
 onUnmounted(() => {
   if (timer.value) {
     clearInterval(timer.value);
   }
+  
+  // 移除窗口大小变化监听器
+  window.removeEventListener('resize', updateSearchAreaSize);
 });
 </script>
 
@@ -689,6 +719,7 @@ onUnmounted(() => {
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
+  padding: 1rem;
 }
 
 .test-container {
@@ -922,6 +953,204 @@ onUnmounted(() => {
 /* 结果阶段 */
 .results-phase {
   padding: 2rem;
+}
+
+/* 大笔记本屏幕优化 (1367px - 1600px) */
+@media (min-width: 1367px) and (max-width: 1600px) {
+  .visual-search-test {
+    max-width: 950px;
+    padding: 1.5rem;
+  }
+  
+  .test-container {
+    padding: 1.5rem;
+  }
+  
+  .instruction-phase {
+    padding: 2rem;
+  }
+  
+  .instruction-content h3 {
+    font-size: 1.8rem;
+  }
+  
+  .instruction-text {
+    max-width: 600px;
+  }
+  
+  .testing-phase {
+    padding: 1.5rem;
+  }
+  
+  .search-canvas {
+    max-width: 750px;
+    max-height: 550px;
+  }
+  
+  .overall-results {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .analysis-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+}
+
+/* 中等笔记本屏幕优化 (1281px - 1366px) */
+@media (min-width: 1281px) and (max-width: 1366px) {
+  .visual-search-test {
+    max-width: 900px;
+    padding: 1.2rem;
+  }
+  
+  .test-container {
+    padding: 1.2rem;
+  }
+  
+  .instruction-phase {
+    padding: 1.5rem;
+  }
+  
+  .instruction-content h3 {
+    font-size: 1.6rem;
+  }
+  
+  .instruction-text {
+    max-width: 550px;
+  }
+  
+  .instruction-steps {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.8rem;
+  }
+  
+  .testing-phase {
+    padding: 1.2rem;
+  }
+  
+  .search-canvas {
+    max-width: 700px;
+    max-height: 500px;
+  }
+  
+  .test-header {
+    padding: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .target-item {
+    width: 26px;
+    height: 26px;
+    font-size: 1.1rem;
+  }
+  
+  .overall-results {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .analysis-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* 小笔记本屏幕优化 (1024px - 1280px) */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .visual-search-test {
+    max-width: 850px;
+    padding: 1rem;
+  }
+  
+  .test-container {
+    padding: 1rem;
+  }
+  
+  .instruction-phase {
+    padding: 1.2rem;
+  }
+  
+  .instruction-content h3 {
+    font-size: 1.5rem;
+  }
+  
+  .instruction-text {
+    max-width: 500px;
+  }
+  
+  .instruction-steps {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.6rem;
+  }
+  
+  .step-item {
+    padding: 0.8rem;
+  }
+  
+  .testing-phase {
+    padding: 1rem;
+  }
+  
+  .search-canvas {
+    max-width: 650px;
+    max-height: 450px;
+  }
+  
+  .test-header {
+    padding: 0.6rem;
+    margin-bottom: 1rem;
+  }
+  
+  .test-info {
+    gap: 1rem;
+  }
+  
+  .target-display {
+    gap: 0.6rem;
+  }
+  
+  .target-item {
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+  }
+  
+  .test-controls {
+    padding: 0.6rem;
+  }
+  
+  .progress-info {
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .overall-results {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+  
+  .result-card {
+    padding: 1rem;
+  }
+  
+  .result-icon {
+    font-size: 1.6rem;
+  }
+  
+  .result-value {
+    font-size: 1.4rem;
+  }
+  
+  .analysis-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .analysis-item {
+    padding: 1rem;
+  }
 }
 
 .results-container h3 {

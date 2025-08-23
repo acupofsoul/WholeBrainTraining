@@ -469,6 +469,177 @@ p {
 }
 
 /* Responsive utilities */
+
+/* 主流笔记本屏幕优化 (1366px - 1920px) - 针对14-15英寸1920x1080屏幕 */
+@media (min-width: 1366px) and (max-width: 1920px) {
+  .container {
+    max-width: 90vw;
+    padding: 0 2rem;
+  }
+  
+  .app-content {
+    max-width: 1400px;
+    width: 90%;
+    padding: 2rem;
+  }
+  
+  .app-header {
+    padding: 1rem 2rem;
+  }
+  
+  .app-title {
+    font-size: 1.8rem;
+  }
+  
+  .nav-link {
+    padding: 0.5rem 0.8rem;
+    font-size: 1rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .training-container {
+    max-width: 1500px;
+    width: 90%;
+    padding: 2rem;
+    margin: 0 auto 2rem;
+  }
+  
+  .training-title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .settings-container {
+    max-width: 1200px;
+    width: 90%;
+    margin: 0 auto;
+  }
+  
+  .settings-section {
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .setting-item {
+    margin-bottom: 1.2rem;
+    padding: 0.6rem 0;
+  }
+  
+  .form-control {
+    padding: 0.8rem;
+  }
+  
+  .btn {
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+  }
+  
+  .btn-lg {
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* 笔记本屏幕断点系统 */
+
+/* 小笔记本屏幕 (1024px - 1365px) - 13英寸笔记本 */
+@media (min-width: 1024px) and (max-width: 1365px) {
+  .container {
+    max-width: 95vw;
+    padding: 0 1.5rem;
+  }
+  
+  .app-content {
+    max-width: 1000px;
+    width: 92%;
+    padding: 1.5rem;
+  }
+  
+  .card {
+    padding: 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .training-container {
+    max-width: 1200px;
+    width: 90%;
+    padding: 1.5rem;
+    margin: 0 auto 1.5rem;
+  }
+  
+  .training-title {
+    font-size: 1.6rem;
+  }
+  
+  .settings-container {
+    max-width: 1000px;
+    width: 88%;
+  }
+  
+  /* 优化测试容器 */
+  .test-container {
+    max-width: 100%;
+    padding: 1.2rem;
+  }
+  
+  /* 优化搜索画布 */
+  .search-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* 优化网格布局 */
+  .training-modules {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .assessment-modules {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* 平板设备屏幕 (769px - 1023px) */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .container {
+    max-width: 95vw;
+    padding: 0 1rem;
+  }
+  
+  .app-content {
+    max-width: 100%;
+    width: 95%;
+    padding: 1rem;
+  }
+  
+  .training-container {
+    max-width: 100%;
+    width: 95%;
+    padding: 1rem;
+    margin: 0 auto 1rem;
+  }
+  
+  .settings-container {
+    max-width: 100%;
+    width: 95%;
+  }
+  
+  .training-modules {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  
+  .assessment-modules {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+}
+
 @media (max-width: 768px) {
   .row {
     flex-direction: column;
@@ -545,7 +716,6 @@ p {
   .btn {
     padding: 0.5rem 0.75rem;
   }
-}
   
   .col {
     flex: 0 0 100%;

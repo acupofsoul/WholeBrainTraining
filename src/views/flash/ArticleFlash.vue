@@ -251,254 +251,24 @@
       </div>
     </div>
 
-    <!-- 训练设置 -->
-    <div class="training-settings" v-if="!isTraining">
-      <h3>训练设置</h3>
-      <div class="settings-grid">
-        <div class="setting-card">
-          <h4>基础设置</h4>
-          <div class="setting-item">
-            <label>闪视速度 (毫秒)</label>
-            <div class="range-container">
-              <input 
-                type="range" 
-                class="range-input"
-                v-model="settings.flashDuration"
-                min="500"
-                max="3000"
-                step="100"
-              >
-              <span class="range-value">{{ settings.flashDuration }}ms</span>
-            </div>
-          </div>
-          <div class="setting-item">
-            <label>间隔时间 (秒)</label>
-            <div class="range-container">
-              <input 
-                type="range" 
-                class="range-input"
-                v-model="settings.intervalTime"
-                min="2"
-                max="8"
-                step="1"
-              >
-              <span class="range-value">{{ settings.intervalTime }}s</span>
-            </div>
-          </div>
-          <div class="setting-item">
-            <label>训练轮次</label>
-            <select class="select-input" v-model="settings.rounds">
-              <option value="5">5轮</option>
-              <option value="10">10轮</option>
-              <option value="15">15轮</option>
-              <option value="20">20轮</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>文章类型</label>
-            <select class="select-input" v-model="settings.articleType">
-              <option value="story">故事类</option>
-              <option value="news">新闻类</option>
-              <option value="science">科普类</option>
-              <option value="mixed">混合类型</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="setting-card">
-          <h4>显示设置</h4>
-          <div class="setting-item">
-            <label>字体大小</label>
-            <div class="range-container">
-              <input 
-                type="range" 
-                class="range-input"
-                v-model="settings.fontSize"
-                min="16"
-                max="32"
-                step="2"
-              >
-              <span class="range-value">{{ settings.fontSize }}px</span>
-            </div>
-          </div>
-          <div class="setting-item">
-            <label>行间距</label>
-            <div class="range-container">
-              <input 
-                type="range" 
-                class="range-input"
-                v-model="settings.lineHeight"
-                min="1.2"
-                max="2.0"
-                step="0.1"
-              >
-              <span class="range-value">{{ settings.lineHeight }}</span>
-            </div>
-          </div>
-          <div class="setting-item">
-            <label>背景颜色</label>
-            <select class="select-input" v-model="settings.backgroundColor">
-              <option value="white">白色</option>
-              <option value="cream">米色</option>
-              <option value="light-gray">浅灰</option>
-              <option value="light-blue">浅蓝</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>文本颜色</label>
-            <select class="select-input" v-model="settings.textColor">
-              <option value="black">黑色</option>
-              <option value="dark-gray">深灰</option>
-              <option value="blue">蓝色</option>
-              <option value="green">绿色</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>主题</label>
-            <select class="select-input" v-model="settings.theme">
-              <option value="default">默认</option>
-              <option value="dark">深色</option>
-              <option value="nature">自然</option>
-              <option value="ocean">海洋</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="setting-card">
-          <h4>训练辅助</h4>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.showProgress"
-              >
-              显示进度
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.soundEffects"
-              >
-              声音效果
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.highlightKeywords"
-              >
-              关键词高亮
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.autoNext"
-              >
-              自动下一题
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.showHints"
-              >
-              提示显示
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.adaptiveDifficulty"
-              >
-              自适应难度
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.showEncouragement"
-              >
-              鼓励消息
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.showReadingGuide"
-              >
-              阅读指南
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="setting-label">
-              <input 
-                type="checkbox" 
-                v-model="settings.progressSound"
-              >
-              进度音效
-            </label>
-          </div>
-        </div>
-
-        <div class="setting-card">
-          <h4>高级设置</h4>
-          <div class="setting-item">
-            <label>难度等级</label>
-            <select class="select-input" v-model="settings.difficulty">
-              <option value="easy">简单</option>
-              <option value="medium">中等</option>
-              <option value="hard">困难</option>
-              <option value="expert">专家</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>内容过滤</label>
-            <select class="select-input" v-model="settings.contentFilter">
-              <option value="all">全部内容</option>
-              <option value="beginner">初学者</option>
-              <option value="intermediate">中级</option>
-              <option value="advanced">高级</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>动画效果</label>
-            <select class="select-input" v-model="settings.animationEffect">
-              <option value="none">无动画</option>
-              <option value="fade">淡入淡出</option>
-              <option value="slide">滑动</option>
-              <option value="zoom">缩放</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>关键词高亮颜色</label>
-            <select class="select-input" v-model="settings.highlightColor">
-              <option value="yellow">黄色</option>
-              <option value="blue">蓝色</option>
-              <option value="green">绿色</option>
-              <option value="red">红色</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>理解模式</label>
-            <select class="select-input" v-model="settings.comprehensionMode">
-              <option value="multiple">选择题</option>
-              <option value="fill">填空题</option>
-              <option value="judge">判断题</option>
-              <option value="mixed">混合模式</option>
-            </select>
-          </div>
-        </div>
-      </div>
+    <!-- 训练设置按钮 -->
+    <div class="settings-section" v-if="!isTraining">
+      <SettingsButton 
+        text="训练设置"
+        variant="primary"
+        @click="openSettings"
+      />
     </div>
+    
+    <!-- 设置弹窗 -->
+    <SettingsModal
+      v-if="showSettingsModal"
+      title="文章闪读训练设置"
+      :sections="settingsSections"
+      @close="closeSettings"
+      @save="saveSettings"
+      @reset="resetSettings"
+    />
 
     <!-- 训练统计 -->
     <div class="training-statistics" v-if="!isTraining">
@@ -655,9 +425,61 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import SettingsModal from '@/components/SettingsModal.vue'
+import SettingsButton from '@/components/SettingsButton.vue'
+import { useTrainingSettings } from '@/composables/useTrainingSettings'
+
 export default {
   name: 'ArticleFlash',
+  components: {
+    SettingsModal,
+    SettingsButton
+  },
   emits: ['go-back'],
+  setup() {
+    // 使用新的训练设置管理
+    const {
+      settings,
+      isLoading: settingsLoading,
+      error: settingsError,
+      updateSettings,
+      resetSettings: resetTrainingSettings,
+      settingsSections
+    } = useTrainingSettings('articleFlash')
+
+    // 设置弹窗状态
+    const showSettingsModal = ref(false)
+
+    // 设置处理方法
+    const handleSettingsSave = async (newSettings) => {
+      try {
+        await updateSettings(newSettings, { immediate: true })
+        showSettingsModal.value = false
+      } catch (error) {
+        console.error('保存设置失败:', error)
+      }
+    }
+
+    const handleSettingsReset = async () => {
+      try {
+        await resetTrainingSettings()
+        showSettingsModal.value = false
+      } catch (error) {
+        console.error('重置设置失败:', error)
+      }
+    }
+
+    return {
+      settings,
+      settingsLoading,
+      settingsError,
+      settingsSections,
+      showSettingsModal,
+      handleSettingsSave,
+      handleSettingsReset
+    }
+  },
   data() {
     return {
       isTraining: false,
@@ -922,34 +744,7 @@ export default {
         ]
       },
       
-      // 训练设置
-      settings: {
-        flashDuration: 2000,
-        intervalTime: 3,
-        rounds: 10,
-        articleType: 'mixed',
-        fontSize: 20,
-        lineHeight: 1.6,
-        backgroundColor: 'white',
-        textColor: '#333',
-        showProgress: true,
-        soundEffects: true,
-        highlightKeywords: false,
-        autoNext: false,
-        // 新增设置
-        difficulty: 'medium',
-        contentFilter: 'all',
-        showHints: true,
-        adaptiveDifficulty: false,
-        customArticles: [],
-        theme: 'default',
-        animationEffects: true,
-        progressSound: true,
-        encouragementMessages: true,
-        readingGuide: true,
-        keywordHighlightColor: '#ffeb3b',
-        comprehensionMode: 'mixed'
-      },
+      // 训练设置现在由setup函数管理
       
       // 统计数据
       statistics: {
@@ -1641,25 +1436,34 @@ export default {
     // 返回父组件
     goBack() {
       this.$emit('go-back')
+    },
+
+    // 设置相关方法现在由setup函数管理
+    openSettings() {
+      this.showSettingsModal = true
+    },
+
+    closeSettings() {
+      this.showSettingsModal = false
+    },
+
+    applySettingsToTraining() {
+      // 应用新的闪视速度和间隔时间
+      this.currentFlashDuration = this.settings.flashDuration
+      this.currentIntervalDuration = this.settings.intervalTime * 1000
     }
+  },
+
+  computed: {
+    // computed属性现在由setup函数提供
   },
   
   mounted() {
-    this.loadSettings()
     this.loadStatistics()
   },
   
   beforeUnmount() {
     this.clearTimers()
-  },
-  
-  watch: {
-    settings: {
-      handler() {
-        this.saveSettings()
-      },
-      deep: true
-    }
   }
 }
 </script>
@@ -2458,10 +2262,12 @@ export default {
   background: #e9ecef;
   outline: none;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -2741,6 +2547,93 @@ export default {
 }
 
 /* 响应式设计 */
+/* 笔记本屏幕优化 (1024px-1440px) */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .article-flash-container {
+    padding: 25px;
+  }
+  
+  .training-card {
+    max-width: 900px;
+    padding: 25px;
+  }
+  
+  .flash-container {
+    min-height: 320px;
+  }
+  
+  .flash-content {
+    padding: 35px;
+  }
+  
+  .modes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+  }
+  
+  .mode-card {
+    padding: 22px;
+  }
+  
+  .page-header h1 {
+    font-size: 2.2rem;
+  }
+  
+  .training-header h3 {
+    font-size: 1.3rem;
+  }
+  
+  .article-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    max-width: 550px;
+  }
+  
+  .comprehension-options {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .settings-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+
+/* 小笔记本屏幕优化 (1024px-1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .training-card {
+    max-width: 850px;
+    padding: 22px;
+  }
+  
+  .flash-container {
+    min-height: 300px;
+  }
+  
+  .flash-content {
+    padding: 30px;
+  }
+  
+  .page-header h1 {
+    font-size: 2.1rem;
+  }
+  
+  .article-text {
+    font-size: 1.05rem;
+    max-width: 520px;
+  }
+  
+  .mode-card {
+    padding: 20px;
+  }
+}
+
 @media (max-width: 768px) {
   .article-flash-container {
     padding: 15px;

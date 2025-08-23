@@ -1,5 +1,22 @@
 <template>
   <div class="image-flash-container">
+    <!-- 设置按钮 -->
+    <SettingsButton 
+      v-if="!isTraining"
+      :floating="true"
+      :compact="true"
+      @click="showSettingsModal = true"
+    />
+    
+    <!-- 设置弹窗 -->
+    <SettingsModal
+      v-if="showSettingsModal"
+      title="图像闪视训练设置"
+      :sections="settingsSections"
+      @close="showSettingsModal = false"
+      @save="handleSettingsSave"
+      @reset="handleSettingsReset"
+    />
 
     <!-- 训练模式选择 -->
     <div class="training-modes" v-if="!isTraining">
@@ -714,11 +731,64 @@
 </template>
 
 <script>
+import SettingsModal from '@/components/SettingsModal.vue'
+import SettingsButton from '@/components/SettingsButton.vue'
+import { useTrainingSettings } from '@/composables/useTrainingSettings'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
 export default {
   name: 'ImageFlash',
+  components: {
+    SettingsModal,
+    SettingsButton
+  },
   emits: ['go-back'],
+  setup() {
+    // 使用训练设置 composable
+    const {
+      settings,
+      isLoading: settingsLoading,
+      error: settingsError,
+      updateSettings,
+      resetSettings: resetTrainingSettings,
+      settingsSections
+    } = useTrainingSettings('imageFlash')
+
+    // 设置弹窗状态
+    const showSettingsModal = ref(false)
+
+    // 设置处理方法
+    const handleSettingsSave = async (newSettings) => {
+      try {
+        await updateSettings(newSettings, { immediate: true })
+        showSettingsModal.value = false
+      } catch (error) {
+        console.error('保存设置失败:', error)
+      }
+    }
+
+    const handleSettingsReset = async () => {
+      try {
+        await resetTrainingSettings()
+        showSettingsModal.value = false
+      } catch (error) {
+        console.error('重置设置失败:', error)
+      }
+    }
+
+    return {
+      settings,
+      settingsLoading,
+      settingsError,
+      settingsSections,
+      showSettingsModal,
+      handleSettingsSave,
+      handleSettingsReset
+    }
+  },
   data() {
     return {
+      // 训练状态
       isTraining: false,
       isPaused: false,
       isCompleted: false,
@@ -923,33 +993,8 @@ export default {
         ]
       },
       
-      // 训练设置
-      settings: {
-        flashDuration: 600,
-        intervalTime: 2,
-        rounds: 10,
-        imageType: 'mixed',
-        imageSize: 200,
-        backgroundColor: 'white',
-        colorMode: 'colorful',
-        showProgress: true,
-        soundEffects: true,
-        randomOrder: true,
-        autoNext: false,
-        // 新增设置选项
-        difficulty: 'all',
-        contentFilter: 'all',
-        showHints: true,
-        adaptiveDifficulty: false,
-        showEncouragement: true,
-        showGuide: true,
-        progressSound: false,
-        animationEffects: true,
-        highlightColor: '#FFD700',
-        recognitionMode: 'instant',
-        textColor: '#333333',
-        theme: 'light'
-      },
+      // 训练设置（从配置服务获取）
+      settings: {},
       
       // 统计数据
       statistics: {
@@ -1006,6 +1051,8 @@ export default {
     }
   },
   
+  // 设置初始化已移至 composable 中自动处理
+  
   computed: {
     recognitionRate() {
       const total = this.correctCount + this.errorCount
@@ -1033,6 +1080,154 @@ export default {
         colorDiscrimination: Math.min(100, this.recognitionRate - 5),
         visualMemory: Math.min(100, this.recognitionRate - 10)
       }
+    },
+    
+    // 设置弹窗配置
+    settingsSections() {
+      return [
+        {
+          title: '基础设置',
+          items: [
+            {
+              key: 'flashDuration',
+              label: '闪现时长',
+              type: 'range',
+              value: this.settings.flashDuration,
+              min: 100,
+              max: 3000,
+              step: 100,
+              unit: 'ms',
+              description: '图像显示的时间长度'
+            },
+            {
+              key: 'intervalDuration',
+              label: '间隔时长',
+              type: 'range',
+              value: this.settings.intervalDuration,
+              min: 0,
+              max: 3000,
+              step: 100,
+              unit: 'ms',
+              description: '图像之间的间隔时间'
+            },
+            {
+              key: 'imageCount',
+              label: '图片数量',
+              type: 'range',
+              value: this.settings.imageCount,
+              min: 5,
+              max: 50,
+              step: 5,
+              description: '每轮训练的图片数量'
+            },
+            {
+              key: 'imageSize',
+              label: '图片尺寸',
+              type: 'select',
+              value: this.settings.imageSize,
+              options: [
+                { value: 'small', label: '小 (150px)' },
+                { value: 'medium', label: '中 (200px)' },
+                { value: 'large', label: '大 (300px)' }
+              ],
+              description: '闪现图片的显示尺寸'
+            }
+          ]
+        },
+        {
+          title: '训练模式',
+          items: [
+            {
+              key: 'mode',
+              label: '训练模式',
+              type: 'select',
+              value: this.settings.mode,
+              options: [
+                { value: 'sequence', label: '顺序模式' },
+                { value: 'random', label: '随机模式' },
+                { value: 'adaptive', label: '自适应模式' }
+              ],
+              description: '图片显示的顺序方式'
+            },
+            {
+              key: 'difficulty',
+              label: '难度等级',
+              type: 'select',
+              value: this.settings.difficulty,
+              options: [
+                { value: 'easy', label: '简单' },
+                { value: 'normal', label: '普通' },
+                { value: 'hard', label: '困难' }
+              ],
+              description: '训练的难度级别'
+            }
+          ]
+        },
+        {
+          title: '显示设置',
+          items: [
+            {
+              key: 'showProgress',
+              label: '显示进度',
+              type: 'switch',
+              value: this.settings.showProgress,
+              description: '是否显示训练进度'
+            },
+            {
+              key: 'showTimer',
+              label: '显示计时器',
+              type: 'switch',
+              value: this.settings.showTimer,
+              description: '是否显示计时器'
+            },
+            {
+              key: 'showScore',
+              label: '显示分数',
+              type: 'switch',
+              value: this.settings.showScore,
+              description: '是否显示实时分数'
+            }
+          ]
+        },
+        {
+          title: '反馈设置',
+          items: [
+            {
+              key: 'enableSound',
+              label: '启用声音',
+              type: 'switch',
+              value: this.settings.enableSound,
+              description: '是否播放音效反馈'
+            },
+            {
+              key: 'showCorrectAnswer',
+              label: '显示正确答案',
+              type: 'switch',
+              value: this.settings.showCorrectAnswer,
+              description: '答错时是否显示正确答案'
+            }
+          ]
+        },
+        {
+          title: '高级设置',
+          items: [
+            {
+              key: 'autoStart',
+              label: '自动开始',
+              type: 'switch',
+              value: this.settings.autoStart,
+              description: '是否自动开始下一轮'
+            },
+            {
+              key: 'adaptiveDifficulty',
+              label: '自适应难度',
+              type: 'switch',
+              value: this.settings.adaptiveDifficulty,
+              description: '根据表现自动调整难度'
+            }
+          ]
+        }
+      ]
     }
   },
   
@@ -1612,18 +1807,9 @@ export default {
       }).join(' ')
     },
     
-    // 保存设置
-    saveSettings() {
-      localStorage.setItem('imageFlashSettings', JSON.stringify(this.settings))
-    },
+    // 保存设置（已移至设置相关方法中）
     
-    // 加载设置
-    loadSettings() {
-      const saved = localStorage.getItem('imageFlashSettings')
-      if (saved) {
-        this.settings = { ...this.settings, ...JSON.parse(saved) }
-      }
-    },
+    // 设置加载已移至 composable 中自动处理
     
     // 保存统计数据
     saveStatistics() {
@@ -1939,11 +2125,31 @@ export default {
     // 返回父组件
     goBack() {
       this.$emit('go-back')
+    },
+    
+    // 设置相关方法
+    openSettings() {
+      this.showSettingsModal = true
+    },
+    
+    closeSettings() {
+      this.showSettingsModal = false
+    },
+    
+    // 设置相关方法已移至 setup() 中
+    
+    applySettingsToTraining() {
+      // 应用设置到当前训练
+      if (this.settings.flashDuration !== this.currentFlashDuration) {
+        this.currentFlashDuration = this.settings.flashDuration
+      }
+      if (this.settings.intervalDuration !== this.currentIntervalDuration) {
+        this.currentIntervalDuration = this.settings.intervalDuration
+      }
     }
   },
   
   mounted() {
-    this.loadSettings()
     this.loadStatistics()
   },
   
@@ -1952,12 +2158,7 @@ export default {
   },
   
   watch: {
-    settings: {
-      handler() {
-        this.saveSettings()
-      },
-      deep: true
-    }
+    // 设置现在通过配置服务管理，不需要监听
   }
 }
 </script>
@@ -3089,10 +3290,12 @@ export default {
   background: #e0e0e0;
   outline: none;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -3382,6 +3585,85 @@ export default {
 }
 
 /* 响应式设计 */
+/* 笔记本屏幕优化 (1024px-1440px) */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .image-flash-container {
+    padding: 25px;
+  }
+  
+  .training-interface {
+    max-width: 900px;
+  }
+  
+  .training-card {
+    padding: 25px;
+  }
+  
+  .flash-container {
+    height: 350px;
+  }
+  
+  .modes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
+  }
+  
+  .mode-card {
+    padding: 22px;
+  }
+  
+  .page-header h1 {
+    font-size: 2.2rem;
+  }
+  
+  .training-header h3 {
+    font-size: 1.3rem;
+  }
+  
+  .info-item {
+    padding: 8px 12px;
+    min-width: 70px;
+  }
+  
+  .recognition-options {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  .settings-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+}
+
+/* 小笔记本屏幕优化 (1024px-1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .training-interface {
+    max-width: 850px;
+  }
+  
+  .flash-container {
+    height: 320px;
+  }
+  
+  .page-header h1 {
+    font-size: 2.1rem;
+  }
+  
+  .mode-card {
+    padding: 20px;
+  }
+  
+  .training-card {
+    padding: 22px;
+  }
+}
+
 @media (max-width: 768px) {
   .image-flash-container {
     padding: 15px;

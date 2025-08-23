@@ -2355,10 +2355,12 @@ export default {
   border-radius: 3px;
   outline: none;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
   width: 20px;
   height: 20px;
   background: #667eea;
@@ -2444,7 +2446,9 @@ export default {
 
 /* 注意力分析 */
 .attention-analysis {
-  space-y: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .analysis-item {
@@ -3119,5 +3123,4 @@ export default {
   .stats-overview {
     grid-template-columns: 1fr;
   }
-}
 </style>

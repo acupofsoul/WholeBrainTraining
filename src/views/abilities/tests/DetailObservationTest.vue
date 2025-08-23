@@ -1624,6 +1624,217 @@ watch(() => props.testData, (newData) => {
   border-bottom: none;
 }
 
+/* 笔记本屏幕优化 */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .detail-observation-test {
+    max-width: 1100px;
+    padding: 18px;
+  }
+  
+  .test-container {
+    border-radius: 10px;
+  }
+  
+  .instruction-phase {
+    padding: 35px;
+  }
+  
+  .instruction-content h3 {
+    font-size: 2.2em;
+    margin-bottom: 25px;
+  }
+  
+  .instruction-steps {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin: 25px 0;
+  }
+  
+  .step-item {
+    padding: 12px;
+  }
+  
+  .testing-phase {
+    padding: 25px;
+  }
+  
+  .test-header {
+    margin-bottom: 25px;
+    padding: 18px;
+  }
+  
+  .detail-image {
+    width: 450px;
+    height: 340px;
+  }
+  
+  .questioning-phase {
+    max-width: 750px;
+  }
+  
+  .question-container h4 {
+    font-size: 1.3em;
+    margin-bottom: 25px;
+  }
+  
+  .question-options {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+  
+  .option-item {
+    padding: 12px;
+  }
+  
+  .option-text {
+    font-size: 1.05em;
+  }
+  
+  .feedback-phase {
+    max-width: 550px;
+  }
+  
+  .feedback-container {
+    padding: 25px;
+  }
+  
+  .results-phase {
+    padding: 35px;
+  }
+  
+  .results-container h3 {
+    font-size: 2em;
+    margin-bottom: 35px;
+  }
+  
+  .overall-results {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    margin-bottom: 35px;
+  }
+  
+  .result-card {
+    padding: 22px;
+  }
+  
+  .analysis-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+  }
+  
+  .analysis-item {
+    padding: 22px;
+  }
+  
+  .performance-feedback {
+    padding: 25px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .detail-observation-test {
+    max-width: 1000px;
+    padding: 16px;
+  }
+  
+  .instruction-phase {
+    padding: 30px;
+  }
+  
+  .instruction-content h3 {
+    font-size: 2em;
+    margin-bottom: 22px;
+  }
+  
+  .instruction-steps {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 22px 0;
+  }
+  
+  .step-item {
+    padding: 10px;
+  }
+  
+  .testing-phase {
+    padding: 22px;
+  }
+  
+  .test-header {
+    margin-bottom: 22px;
+    padding: 16px;
+  }
+  
+  .detail-image {
+    width: 400px;
+    height: 300px;
+  }
+  
+  .questioning-phase {
+    max-width: 700px;
+  }
+  
+  .question-container h4 {
+    font-size: 1.25em;
+    margin-bottom: 22px;
+  }
+  
+  .question-options {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  
+  .option-item {
+    padding: 10px;
+  }
+  
+  .option-text {
+    font-size: 1em;
+  }
+  
+  .feedback-phase {
+    max-width: 500px;
+  }
+  
+  .feedback-container {
+    padding: 22px;
+  }
+  
+  .results-phase {
+    padding: 30px;
+  }
+  
+  .results-container h3 {
+    font-size: 1.8em;
+    margin-bottom: 30px;
+  }
+  
+  .overall-results {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  
+  .result-card {
+    padding: 20px;
+  }
+  
+  .analysis-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 22px;
+  }
+  
+  .analysis-item {
+    padding: 20px;
+  }
+  
+  .performance-feedback {
+    padding: 22px;
+  }
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .detail-observation-test {

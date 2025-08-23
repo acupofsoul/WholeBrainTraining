@@ -276,100 +276,15 @@
     </div>
 
     <!-- 训练设置 -->
-    <div class="training-settings">
-      <h3>训练设置</h3>
-      <div class="settings-grid">
-        <div class="setting-card">
-          <h4>基础设置</h4>
-          <div class="setting-item">
-            <label>训练时长:</label>
-            <select v-model="settings.duration" class="select-input">
-              <option value="300">5分钟</option>
-              <option value="600">10分钟</option>
-              <option value="900">15分钟</option>
-              <option value="1200">20分钟</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label>难度级别:</label>
-            <input 
-              v-model.number="settings.difficulty" 
-              type="range" 
-              min="1" 
-              max="10" 
-              class="range-input"
-            >
-            <span class="range-value">{{ settings.difficulty }}</span>
-          </div>
-          <div class="setting-item">
-            <label class="checkbox-label">
-              <input v-model="settings.soundEnabled" type="checkbox" class="checkbox-input">
-              <span class="checkbox-text">音效提示</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="setting-card">
-          <h4>专注力设置</h4>
-          <div class="setting-item">
-            <label>目标出现频率:</label>
-            <input 
-              v-model.number="settings.targetFrequency" 
-              type="range" 
-              min="10" 
-              max="50" 
-              class="range-input"
-            >
-            <span class="range-value">{{ settings.targetFrequency }}%</span>
-          </div>
-          <div class="setting-item">
-            <label>刺激持续时间:</label>
-            <input 
-              v-model.number="settings.stimulusDuration" 
-              type="range" 
-              min="500" 
-              max="3000" 
-              step="100" 
-              class="range-input"
-            >
-            <span class="range-value">{{ settings.stimulusDuration }}ms</span>
-          </div>
-          <div class="setting-item">
-            <label class="checkbox-label">
-              <input v-model="settings.showFeedback" type="checkbox" class="checkbox-input">
-              <span class="checkbox-text">即时反馈</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="setting-card">
-          <h4>高级设置</h4>
-          <div class="setting-item">
-            <label>干扰强度:</label>
-            <input 
-              v-model.number="settings.interferenceLevel" 
-              type="range" 
-              min="1" 
-              max="5" 
-              class="range-input"
-            >
-            <span class="range-value">{{ settings.interferenceLevel }}</span>
-          </div>
-          <div class="setting-item">
-            <label class="checkbox-label">
-              <input v-model="settings.adaptiveDifficulty" type="checkbox" class="checkbox-input">
-              <span class="checkbox-text">自适应难度</span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <label class="checkbox-label">
-              <input v-model="settings.detailedStats" type="checkbox" class="checkbox-input">
-              <span class="checkbox-text">详细统计</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
+    <SettingsButton @click="openSettings" />
+    
+    <SettingsModal
+      v-if="showSettingsModal"
+      :sections="settingsSections"
+      @close="closeSettings"
+      @save="saveSettings"
+      @reset="resetSettings"
+    />
 
     <!-- 统计数据 -->
     <div class="statistics-section">
@@ -479,9 +394,16 @@
 <script>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useBasicTraining, useBasicTrainingSettings, useBasicTrainingStats } from '@/composables/useBasicTraining'
+import SettingsModal from '@/components/SettingsModal.vue'
+import SettingsButton from '@/components/SettingsButton.vue'
+import { useTrainingSettings } from '@/composables/useTrainingSettings'
 
 export default {
   name: 'Attention',
+  components: {
+    SettingsModal,
+    SettingsButton
+  },
   emits: ['back'],
   setup(props, { emit }) {
     // 使用组合式函数
@@ -509,8 +431,7 @@ export default {
 
     const {
       settings,
-      updateSettings,
-      resetSettings
+      updateSettings
     } = useBasicTrainingSettings(trainingManager)
 
     const {
@@ -527,6 +448,19 @@ export default {
     const allTimeStats = computed(() => stats)
     const recentSessions = computed(() => stats.recentSessions || [])
     const achievements = computed(() => stats.achievements || [])
+
+    // 使用新的设置管理系统
+    const {
+      settings: trainingSettings,
+      settingsSections,
+      showSettingsModal,
+      isLoading: settingsLoading,
+      error: settingsError,
+      saveSettings: handleSettingsSave,
+      resetSettings: handleSettingsReset,
+      openSettings,
+      closeSettings
+    } = useTrainingSettings('attention')
 
     // 本地状态
     const targetActive = ref(false)
@@ -1095,9 +1029,13 @@ export default {
       startTraining(selectedMode.value)
     }
 
+    // 设置相关方法现在由 useTrainingSettings 提供
+    // settingsSections 现在由 useTrainingSettings 提供
+
     // 生命周期
     onMounted(() => {
       // 数据已通过组合式函数自动加载
+      // 设置加载现在由 useTrainingSettings 自动处理
     })
 
     onUnmounted(() => {
@@ -1153,7 +1091,8 @@ export default {
       achievements,
       
       // 设置
-      settings,
+      showSettingsModal,
+      settingsSections,
       
       // 方法
       selectMode,
@@ -1170,7 +1109,11 @@ export default {
       selectMetacognitionOption,
       formatTime,
       closeModal,
-      restartTraining
+      restartTraining,
+      openSettings,
+      closeSettings,
+      saveSettings: handleSettingsSave,
+      resetSettings: handleSettingsReset
     }
   }
 }
@@ -1855,95 +1798,7 @@ export default {
   color: #2d3748;
 }
 
-.training-settings {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-}
 
-.training-settings h3 {
-  color: #2d3748;
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.setting-card {
-  background: #f7fafc;
-  border-radius: 15px;
-  padding: 1.5rem;
-}
-
-.setting-card h4 {
-  color: #2d3748;
-  margin: 0 0 1rem 0;
-  font-size: 1.2rem;
-}
-
-.setting-item {
-  margin-bottom: 1rem;
-}
-
-.setting-item:last-child {
-  margin-bottom: 0;
-}
-
-.setting-item label {
-  display: block;
-  color: #4a5568;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-.select-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-
-.select-input:focus {
-  outline: none;
-  border-color: #4299e1;
-}
-
-.range-input {
-  width: calc(100% - 60px);
-  margin-right: 10px;
-}
-
-.range-value {
-  font-weight: 600;
-  color: #4299e1;
-  min-width: 50px;
-  text-align: right;
-}
-
-.checkbox-label {
-  display: flex !important;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.checkbox-input {
-  width: auto;
-  margin: 0;
-}
-
-.checkbox-text {
-  color: #4a5568;
-  font-weight: 500;
-}
 
 .statistics-section {
   background: rgba(255, 255, 255, 0.95);
@@ -2217,6 +2072,117 @@ export default {
 }
 
 /* 响应式设计 */
+/* 笔记本屏幕优化 (1024px-1440px) */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .attention-container {
+    padding: 1.8rem;
+  }
+  
+  .page-header {
+    padding: 1.8rem;
+  }
+  
+  .title-section .page-title {
+    font-size: 2.2rem;
+  }
+  
+  .page-description {
+    font-size: 1.05rem;
+  }
+  
+  .header-stats {
+    gap: 1.8rem;
+  }
+  
+  .header-stats .stat-value {
+    font-size: 1.8rem;
+  }
+  
+  .mode-selection h2 {
+    font-size: 1.6rem;
+  }
+  
+  .modes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.3rem;
+  }
+  
+  .mode-card {
+    padding: 1.3rem;
+  }
+  
+  .mode-name {
+    font-size: 1.2rem;
+  }
+  
+  .mode-description {
+    font-size: 0.95rem;
+  }
+  
+  .training-interface {
+    padding: 1.8rem;
+  }
+  
+  .training-header .mode-name {
+    font-size: 1.4rem;
+  }
+  
+  .test-area {
+    padding: 1.5rem;
+  }
+  
+  .focus-target {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .training-stats {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .settings-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.3rem;
+  }
+  
+  .setting-card {
+    padding: 1.3rem;
+  }
+  
+  .completion-modal {
+    max-width: 500px;
+    padding: 2rem;
+  }
+}
+
+/* 特定笔记本尺寸优化 (1024px-1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .modes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .mode-card {
+    padding: 1.2rem;
+  }
+  
+  .training-stats {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 1rem;
+  }
+  
+  .completion-stats {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+  
+  .focus-target {
+    width: 110px;
+    height: 110px;
+  }
+}
+
 @media (max-width: 768px) {
   .attention-container {
     padding: 1rem;

@@ -895,8 +895,8 @@ watch(() => props.initialSettings, (newSettings) => {
 
 <style scoped>
 .calculation-assessment {
-  width: 100%;
-  max-width: 1400px;
+  width: 90%;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

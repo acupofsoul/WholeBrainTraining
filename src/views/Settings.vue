@@ -458,7 +458,8 @@ export default {
 
 <style scoped>
 .settings-container {
-  max-width: 800px;
+  max-width: 1200px;
+  width: 90%;
   margin: 0 auto;
   padding: 20px;
 }
@@ -486,11 +487,12 @@ h2 {
 }
 
 .setting-item {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
   align-items: center;
   margin-bottom: 15px;
-  padding: 8px 0;
+  padding: 12px 0;
 }
 
 label {
@@ -514,9 +516,10 @@ input[type="checkbox"] {
 }
 
 .data-management-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
 }
 
 .settings-actions {

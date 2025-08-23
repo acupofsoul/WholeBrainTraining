@@ -416,6 +416,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useTrainingStore } from '../../stores';
+import { audioEngine, audioUtils } from '../../utils/audioUtils';
 
 const emit = defineEmits(['back']);
 
@@ -441,7 +442,9 @@ const tapTimes = ref([]);
 const maxTapInterval = 3000; // 3秒内的点击才算有效
 
 // 音频相关
-let audioContext = null;
+const audioInitialized = ref(false);
+const audioError = ref(null);
+const currentAudioNodes = ref(null);
 let metronomeInterval = null;
 let sessionTimer = null;
 
@@ -856,15 +859,19 @@ const togglePlayPause = () => {
   }
 };
 
-const startMetronome = () => {
+const startMetronome = async () => {
   isPlaying.value = true;
   currentBeat.value = 0;
   currentMeasure.value = 0;
   totalBeats.value = 0;
   
-  initAudioContext();
-  startMetronomeLoop();
-  startSessionTimer();
+  await initAudioContext();
+  if (audioInitialized.value) {
+    startMetronomeLoop();
+    startSessionTimer();
+  } else {
+    isPlaying.value = false;
+  }
 };
 
 const stopMetronome = () => {
@@ -873,32 +880,30 @@ const stopMetronome = () => {
   clearInterval(sessionTimer);
 };
 
-const initAudioContext = () => {
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const initAudioContext = async () => {
+  try {
+    audioInitialized.value = false;
+    audioError.value = null;
+    await audioEngine.initialize();
+    audioInitialized.value = true;
+  } catch (error) {
+    console.error('节拍器音频初始化失败:', error);
+    audioError.value = error.message;
   }
 };
 
-const playBeat = (isAccent = false) => {
-  if (settings.value.visualOnly || !audioContext) return;
+const playBeat = async (isAccent = false) => {
+  if (settings.value.visualOnly || !audioInitialized.value) return;
   
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-  
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-  
-  // 设置音频参数
-  const frequency = isAccent && settings.value.accentBeat ? 800 : 600;
-  const duration = 0.1;
-  const currentVolume = volume.value / 100 * 0.3;
-  
-  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-  gainNode.gain.setValueAtTime(currentVolume, audioContext.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
-  
-  oscillator.start(audioContext.currentTime);
-  oscillator.stop(audioContext.currentTime + duration);
+  try {
+    const frequency = isAccent && settings.value.accentBeat ? 800 : 600;
+    const currentVolume = volume.value / 100;
+    const duration = 0.1;
+    
+    await audioUtils.playMetronomeSound(frequency, currentVolume, duration);
+  } catch (error) {
+    console.error('播放节拍音频失败:', error);
+  }
 };
 
 const startMetronomeLoop = () => {
@@ -950,11 +955,11 @@ const completeSession = () => {
   }
 };
 
-const updateTempo = () => {
+const updateTempo = async () => {
   if (isPlaying.value) {
     stopMetronome();
-    setTimeout(() => {
-      startMetronome();
+    setTimeout(async () => {
+      await startMetronome();
     }, 100);
   }
 };
