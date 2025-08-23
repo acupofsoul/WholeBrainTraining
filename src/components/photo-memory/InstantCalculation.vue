@@ -2,7 +2,7 @@
   <div class="instant-calculation">
     <div class="training-header">
       <h2>瞬间计算</h2>
-      <p>快速计算数字，提升数学直觉</p>
+      <p>超高速闪记数字，提升数学直觉</p>
     </div>
 
     <div class="training-content">

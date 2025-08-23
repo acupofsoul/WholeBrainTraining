@@ -130,8 +130,8 @@ const routes = [
         component: () => import('../views/basic/SchulteTable.vue')
       },
       {
-        path: 'quick-calculation',
-        name: 'QuickCalculation',
+        path: 'ultra-high-speed-flash',
+        name: 'UltraHighSpeedFlash',
         component: () => import('../views/basic/QuickCalculation.vue')
       }
     ]

@@ -1,8 +1,8 @@
 <template>
-  <div class="quick-calculation-container">
+  <div class="ultra-high-speed-flash-container">
     <div class="header">
-      <h2>快速计算训练</h2>
-      <p class="description">通过快速数点训练，提升数字感知和计算能力</p>
+      <h2>超高速闪记训练</h2>
+      <p class="description">通过超高速闪记训练，提升数字感知和计算能力</p>
     </div>
 
     <!-- 设置面板 -->
@@ -103,56 +103,89 @@
         ></div>
       </div>
 
-      <!-- 输入答案 -->
-      <div class="answer-section" v-if="!showDots && countdown === 0 && !showResult">
-        <h3>请输入您看到的黑点数量：</h3>
-        <div class="answer-input-container">
-          <div class="answer-input">
-            <input 
-              type="number" 
-              v-model="userAnswer" 
-              @keyup.enter="submitAnswer"
-              ref="answerInput"
-              min="0"
-              max="100"
-              placeholder="输入数量"
-            >
-            <button @click="submitAnswer" :disabled="!userAnswer" class="submit-btn">确认</button>
+      <!-- 答案显示区域（显示答案模式时在画布上方显示） -->
+      <div class="answer-display" v-if="showAnswerMode && countdown === 0">
+        <div class="answer-info">
+          <h3>正确答案：{{ dotCount }}</h3>
+          <p class="count-instruction">黑点已重新显示，请仔细数一数验证答案</p>
+        </div>
+        <div class="answer-actions">
+          <button @click="startNewRound" class="action-btn next-btn">
+            下一轮
+          </button>
+          <button @click="finishTraining" class="action-btn finish-btn">
+            结束训练
+          </button>
+        </div>
+      </div>
+
+      <!-- 弹窗：输入答案或显示答案选择 -->
+      <div class="modal-overlay" v-if="showModal" @click="closeModal">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h3>请选择操作</h3>
+            <button class="close-btn" @click="closeModal">×</button>
           </div>
           
-          <div class="divider">
-           </div>
-          
-          <div class="show-answer-option">
-            <span class="hint-text">不确定？</span>
-            <button @click="showCorrectAnswer" class="show-answer-btn">显示答案</button>
+          <div class="modal-body">
+            <div class="option-section">
+              <h4>输入您看到的黑点数量：</h4>
+              <div class="input-group">
+                <input 
+                  type="number" 
+                  v-model="userAnswer" 
+                  @keyup.enter="submitAnswer"
+                  ref="answerInput"
+                  min="0"
+                  max="1000"
+                  placeholder="输入数量"
+                  class="answer-input"
+                >
+                <button @click="submitAnswer" :disabled="!userAnswer" class="submit-btn">提交答案</button>
+              </div>
+            </div>
+            
+            <div class="divider-line"></div>
+            
+            <div class="option-section">
+              <h4>或者直接查看答案：</h4>
+              <button @click="showCorrectAnswer" class="show-answer-btn">显示正确答案</button>
+              <p class="hint-text">查看答案不会计入统计</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 结果显示 -->
-      <div class="result-section" v-if="showResult">
-        <div class="result-card" :class="{ 
-          correct: isCorrect === true, 
-          incorrect: isCorrect === false,
-          'show-answer': isCorrect === null 
-        }">
-          <div class="result-icon" v-if="isCorrect !== null">{{ isCorrect ? '✓' : '✗' }}</div>
-          <div class="result-icon" v-else>👁️</div>
+      <!-- 结果显示弹窗 -->
+      <div class="modal-overlay" v-if="showResultModal" @click="closeResultModal">
+        <div class="modal-content result-modal" @click.stop>
+          <div class="modal-header">
+            <h3>训练结果</h3>
+            <button class="close-btn" @click="closeResultModal">×</button>
+          </div>
           
-          <h3 v-if="isCorrect === true">回答正确！</h3>
-          <h3 v-else-if="isCorrect === false">回答错误</h3>
-          <h3 v-else>正确答案</h3>
-          
-          <p>正确答案：{{ dotCount }}</p>
-          <p v-if="userAnswer && isCorrect !== null">您的答案：{{ userAnswer }}</p>
-          <p v-if="isCorrect === false">差值：{{ Math.abs(dotCount - userAnswer) }}</p>
-          <p v-if="isCorrect === null" class="no-input-hint">您选择了查看答案，此轮不计入统计</p>
-        </div>
-        
-        <div class="action-buttons">
-          <button @click="nextRound" class="next-btn">下一轮</button>
-          <button @click="endTraining" class="end-btn">结束训练</button>
+          <div class="modal-body">
+            <div class="result-card" :class="{ 
+              correct: isCorrect === true, 
+              incorrect: isCorrect === false
+            }">
+              <div class="result-icon">{{ isCorrect ? '✓' : '✗' }}</div>
+              
+              <h3 v-if="isCorrect === true">回答正确！</h3>
+              <h3 v-else>回答错误</h3>
+              
+              <div class="result-details">
+                <p><strong>正确答案：</strong>{{ dotCount }}</p>
+                <p><strong>您的答案：</strong>{{ userAnswer }}</p>
+                <p v-if="!isCorrect"><strong>差值：</strong>{{ Math.abs(dotCount - userAnswer) }}</p>
+              </div>
+            </div>
+            
+            <div class="action-buttons">
+              <button @click="nextRound" class="next-btn">下一轮</button>
+              <button @click="endTraining" class="end-btn">结束训练</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -194,7 +227,9 @@ const rangeError = ref('') // 范围验证错误信息
 const dotSize = ref(20)
 const displayTime = ref(2000) // 毫秒
 const showDots = ref(false)
-const showResult = ref(false)
+const showModal = ref(false)
+const showResultModal = ref(false)
+const showAnswerMode = ref(false)
 const userAnswer = ref('')
 const isCorrect = ref(false)
 const dots = ref([])
@@ -297,7 +332,9 @@ const generateDots = () => {
 // 开始训练
 const startTraining = () => {
   isTraining.value = true
-  showResult.value = false
+  showModal.value = false
+  showResultModal.value = false
+  showAnswerMode.value = false
   userAnswer.value = ''
   
   // 开始倒计时
@@ -319,15 +356,22 @@ const startRound = () => {
     return // 如果有严重错误，不开始训练
   }
   
+  // 重置状态
+  showModal.value = false
+  showResultModal.value = false
+  showAnswerMode.value = false
+  userAnswer.value = ''
+  
   // 生成本轮的随机黑点数量
   dotCount.value = generateRandomDotCount()
   
   generateDots()
   showDots.value = true
   
-  // 显示指定时间后隐藏黑点
+  // 显示指定时间后隐藏黑点并显示弹窗
   setTimeout(() => {
     showDots.value = false
+    showModal.value = true
     nextTick(() => {
       if (answerInput.value) {
         answerInput.value.focus()
@@ -352,23 +396,48 @@ const submitAnswer = () => {
   stats.accuracy = (stats.correctCount / stats.totalRounds) * 100
   stats.averageError = stats.totalError / stats.totalRounds
   
-  showResult.value = true
+  // 关闭输入弹窗，显示结果弹窗
+  showModal.value = false
+  showResultModal.value = true
   saveStats()
 }
 
 // 显示正确答案（无输入模式）
 const showCorrectAnswer = () => {
-  // 不需要用户输入，直接显示正确答案
-  userAnswer.value = '' // 清空用户输入
-  isCorrect.value = null // 标记为查看答案模式，不计入正确/错误统计
+  // 关闭弹窗
+  showModal.value = false
   
-  // 不更新统计数据，因为用户选择了查看答案
-  showResult.value = true
+  // 进入答案显示模式
+  showAnswerMode.value = true
+  
+  // 重新显示黑点供用户验证
+  showDots.value = true
+  
+  // 清空用户输入
+  userAnswer.value = ''
+  isCorrect.value = null // 标记为查看答案模式，不计入统计
+}
+
+/**
+ * 重新开始新一轮训练
+ */
+const startNewRound = () => {
+  showAnswerMode.value = false
+  nextRound()
+}
+
+/**
+ * 结束当前训练
+ */
+const finishTraining = () => {
+  showAnswerMode.value = false
+  endTraining()
 }
 
 // 下一轮
 const nextRound = () => {
-  showResult.value = false
+  showResultModal.value = false
+  showAnswerMode.value = false
   userAnswer.value = ''
   startRound()
 }
@@ -376,9 +445,21 @@ const nextRound = () => {
 // 结束训练
 const endTraining = () => {
   isTraining.value = false
-  showResult.value = false
+  showModal.value = false
+  showResultModal.value = false
+  showAnswerMode.value = false
   showDots.value = false
   countdown.value = 0
+}
+
+// 关闭输入弹窗
+const closeModal = () => {
+  showModal.value = false
+}
+
+// 关闭结果弹窗
+const closeResultModal = () => {
+  showResultModal.value = false
 }
 
 // 处理画布点击（可选功能）
@@ -397,7 +478,7 @@ const saveStats = () => {
       averageError: stats.averageError,
       lastUpdated: new Date().toISOString()
     }
-    localStorage.setItem('quickCalculationStats', JSON.stringify(data))
+    localStorage.setItem('ultraHighSpeedFlashStats', JSON.stringify(data))
   } catch (error) {
     console.error('保存统计数据失败:', error)
   }
@@ -406,7 +487,7 @@ const saveStats = () => {
 // 加载统计数据
 const loadStats = () => {
   try {
-    const saved = localStorage.getItem('quickCalculationStats')
+    const saved = localStorage.getItem('ultraHighSpeedFlashStats')
     if (saved) {
       const data = JSON.parse(saved)
       Object.assign(stats, data)
@@ -423,7 +504,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.quick-calculation-container {
+.ultra-high-speed-flash-container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
@@ -623,128 +704,190 @@ onMounted(() => {
   pointer-events: none;
 }
 
-.answer-section {
-  margin: 2rem 0;
-}
-
-.answer-section h3 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
-
-.answer-input-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  background: #f8f9fa;
+/* 答案显示区域样式 */
+.answer-display {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #2196f3;
+}
+
+.answer-info h3 {
+  color: #1976d2;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.count-instruction {
+  color: #424242;
+  margin: 0 0 1rem 0;
+  font-style: italic;
+}
+
+.answer-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.action-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.next-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.next-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+}
+
+.finish-btn {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.finish-btn:hover {
+  background: linear-gradient(135deg, #c82333, #a71e2a);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+}
+
+@media (max-width: 480px) {
+  .answer-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .action-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+/* 弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.4rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.option-section {
+  margin-bottom: 1.5rem;
+}
+
+.option-section h4 {
+  margin: 0 0 1rem 0;
+  color: #555;
+  font-size: 1.1rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .answer-input {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.answer-input input {
-  width: 140px;
-  padding: 0.8rem 1rem;
-  border: 2px solid #bdc3c7;
+  flex: 1;
+  min-width: 120px;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
   border-radius: 8px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   text-align: center;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease;
 }
 
-.answer-input input:focus {
+.answer-input:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-.answer-input input::placeholder {
-  color: #95a5a6;
-  font-size: 1rem;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .submit-btn {
-  padding: 0.8rem 1.5rem;
-  background: #27ae60;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3);
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: #229954;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.4);
-}
-
-.submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: 0 2px 4px rgba(39, 174, 96, 0.2);
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.divider::before {
-  content: '';
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(to bottom, transparent, #bdc3c7, transparent);
-  margin-right: 1rem;
-}
-
-.divider::after {
-  content: '';
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(to bottom, transparent, #bdc3c7, transparent);
-  margin-left: 1rem;
-}
-
-.divider-text {
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  font-weight: 500;
-  background: #f8f9fa;
-  padding: 0 0.5rem;
-}
-
-.show-answer-option {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.hint-text {
-  color: #7f8c8d;
-  font-size: 0.9rem;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.show-answer-btn {
-  padding: 0.8rem 1.5rem;
-  background: #f39c12;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
   border: none;
   border-radius: 8px;
@@ -752,52 +895,75 @@ onMounted(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(243, 156, 18, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
   white-space: nowrap;
 }
 
-.show-answer-btn:hover {
-  background: #e67e22;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(243, 156, 18, 0.4);
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
 }
 
-/* 响应式设计 */
+.submit-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.divider-line {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ddd, transparent);
+  margin: 1.5rem 0;
+}
+
+.show-answer-btn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.show-answer-btn:hover {
+  background: linear-gradient(135deg, #1e7e34, #155724);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}
+
+.hint-text {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+  margin: 0.5rem 0 0 0;
+  text-align: center;
+}
+
+/* 结果弹窗样式 */
+.result-modal .modal-content {
+  max-width: 400px;
+}
+
 @media (max-width: 768px) {
-  .answer-input-container {
+  .modal-content {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .input-group {
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem;
+    align-items: stretch;
   }
   
-  .divider::before,
-  .divider::after {
-    display: none;
-  }
-  
-  .divider {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .divider-text {
-    position: relative;
-  }
-  
-  .divider-text::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: -50px;
-    right: -50px;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #bdc3c7, transparent);
-    z-index: -1;
-  }
-  
-  .answer-input,
-  .show-answer-option {
-    justify-content: center;
+  .answer-input {
+    min-width: auto;
   }
 }
 
@@ -925,7 +1091,7 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .quick-calculation-container {
+  .ultra-high-speed-flash-container {
     padding: 1rem;
   }
   

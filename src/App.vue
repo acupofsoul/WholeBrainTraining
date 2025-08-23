@@ -38,7 +38,7 @@
             <router-link to="/basic-training/fluency" class="dropdown-item">流畅性训练</router-link>
             <router-link to="/basic-training/attention" class="dropdown-item">注意力训练</router-link>
             <router-link to="/basic-training/schulte" class="dropdown-item">舒尔特表</router-link>
-            <router-link to="/basic-training/quick-calculation" class="dropdown-item">快速计算</router-link>
+            <router-link to="/basic-training/ultra-high-speed-flash" class="dropdown-item">超高速闪记</router-link>
           </div>
         </div>
         

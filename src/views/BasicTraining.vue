@@ -65,9 +65,9 @@
           <div class="module-level">难度：⭐⭐⭐</div>
         </div>
 
-        <div class="module-card" @click="navigateTo('quick-calculation')">
+        <div class="module-card" @click="navigateTo('ultra-high-speed-flash')">
           <div class="module-icon">⚫</div>
-          <h3>快速计算训练</h3>
+          <h3>超高速闪记训练</h3>
           <p>通过快速数点训练，提升数字感知和计算能力</p>
           <div class="module-level">难度：⭐⭐</div>
         </div>
@@ -158,7 +158,7 @@ const moduleTitles = {
   '/basic-training/fluency': '流畅度训练',
   '/basic-training/attention': '注意力训练',
   '/basic-training/schulte': '舒尔特表训练',
-  '/basic-training/quick-calculation': '快速计算训练'
+  '/basic-training/ultra-high-speed-flash': '超高速闪记训练'
 };
 
 // 同级模块列表
@@ -169,7 +169,7 @@ const siblingModules = [
   { path: '/basic-training/fluency', title: '流畅度训练' },
   { path: '/basic-training/attention', title: '注意力训练' },
   { path: '/basic-training/schulte', title: '舒尔特表训练' },
-  { path: '/basic-training/quick-calculation', title: '快速计算训练' }
+  { path: '/basic-training/ultra-high-speed-flash', title: '超高速闪记训练' }
 ];
 
 // 获取模块标题

@@ -78,7 +78,7 @@
       <div class="module-card" @click="navigateTo('instant-calculation')">
         <div class="module-icon">🔢</div>
         <h3>瞬时计算</h3>
-        <p>结合视觉记忆的快速计算训练，提升数字处理和运算能力</p>
+        <p>结合视觉记忆的超高速闪记训练，提升数字处理和运算能力</p>
         <div class="module-level">难度：⭐⭐⭐⭐</div>
         <div class="module-stats">
           <span>计算速度：{{ calcStats.speed }}题/分</span>

@@ -50,7 +50,7 @@
         <div class="countdown-circle">
           <span class="countdown-number">{{ countdown }}</span>
         </div>
-        <p>请准备好进行快速计算</p>
+        <p>请准备好进行超高速闪记</p>
       </div>
 
       <!-- 计算阶段 -->

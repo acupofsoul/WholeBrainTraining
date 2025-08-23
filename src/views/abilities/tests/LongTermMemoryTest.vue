@@ -909,7 +909,7 @@ const generateMathTask = () => {
   currentInterferenceTask.value = {
     type: 'math',
     title: '数学计算',
-    instruction: '请快速计算下面的数学题：',
+    instruction: '请超高速闪记下面的数学题：',
     problem: `${a} ${operation} ${b} = ?`,
     correctAnswer: answer
   }
