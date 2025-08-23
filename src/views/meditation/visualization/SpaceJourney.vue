@@ -1,5 +1,16 @@
 <template>
   <div class="space-journey-container">
+    <!-- 面包屑导航 -->
+    <BreadcrumbDropdown
+      main-title="冥想训练"
+      main-path="/meditation"
+      sub-title="想象力训练"
+      sub-path="/meditation/visualization"
+      current-title="太空冒险"
+      :sibling-modules="siblingModules"
+      :sub-sibling-modules="subSiblingModules"
+    />
+    
     <!-- 页面头部 -->
     <div class="page-header">
       <div class="header-background">
@@ -160,8 +171,28 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import BreadcrumbDropdown from '@/components/BreadcrumbDropdown.vue'
 
 const router = useRouter()
+
+// 面包屑导航数据
+const siblingModules = ref([
+  { title: '正念冥想', path: '/meditation/mindfulness' },
+  { title: '专注冥想', path: '/meditation/focus' },
+  { title: '想象力训练', path: '/meditation/visualization' },
+  { title: '治愈冥想', path: '/meditation/healing' },
+  { title: '创意冥想', path: '/meditation/creativity' },
+  { title: '引导冥想', path: '/meditation/guided' },
+  { title: '睡眠冥想', path: '/meditation/sleep' }
+])
+
+const subSiblingModules = ref([
+  { title: '魔法花园', path: '/meditation/visualization/magic-garden' },
+  { title: '太空冒险', path: '/meditation/visualization/space-journey' },
+  { title: '海底世界', path: '/meditation/visualization/ocean-adventure' },
+  { title: '童话世界', path: '/meditation/visualization/fairy-tale' },
+  { title: '动物朋友', path: '/meditation/visualization/animal-friends' }
+])
 
 // 训练步骤数据
 const trainingSteps = ref([

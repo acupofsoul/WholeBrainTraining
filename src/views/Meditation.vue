@@ -2,7 +2,7 @@
   <div class="meditation-container">
     <!-- 面包屑导航 -->
     <BreadcrumbDropdown 
-      v-if="$route.path !== '/meditation'"
+      v-if="$route.path !== '/meditation' && !$route.path.startsWith('/meditation/visualization/')"
       :main-title="'冥想训练'"
       :main-path="'/meditation'"
       :current-title="getModuleTitle($route.path)"
