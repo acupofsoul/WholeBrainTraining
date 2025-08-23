@@ -690,8 +690,6 @@ const breathingModes = ref([
     font-size: 2rem;
   }
   
-
-  
   .start-training-btn {
     padding: 0.8rem 1.5rem;
     font-size: 1rem;

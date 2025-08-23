@@ -84,7 +84,34 @@ const routes = [
       {
         path: 'visualization',
         name: 'VisualizationTraining',
-        component: () => import('../views/meditation/VisualizationTraining.vue')
+        component: () => import('../views/meditation/VisualizationTraining.vue'),
+        children: [
+          {
+            path: 'magic-garden',
+            name: 'MagicGarden',
+            component: () => import('../views/meditation/visualization/MagicGarden.vue')
+          },
+          {
+            path: 'ocean-adventure',
+            name: 'OceanAdventure',
+            component: () => import('../views/meditation/visualization/OceanAdventure.vue')
+          },
+          {
+            path: 'space-journey',
+            name: 'SpaceJourney',
+            component: () => import('../views/meditation/visualization/SpaceJourney.vue')
+          },
+          {
+            path: 'fairy-tale',
+            name: 'FairyTale',
+            component: () => import('../views/meditation/visualization/FairyTale.vue')
+          },
+          {
+            path: 'animal-friends',
+            name: 'AnimalFriends',
+            component: () => import('../views/meditation/visualization/AnimalFriends.vue')
+          }
+        ]
       },
       {
         path: 'mindfulness',
