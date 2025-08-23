@@ -104,29 +104,50 @@
       </div>
 
       <!-- 输入答案 -->
-      <div class="answer-section" v-if="!showDots && countdown === 0">
+      <div class="answer-section" v-if="!showDots && countdown === 0 && !showResult">
         <h3>请输入您看到的黑点数量：</h3>
-        <div class="answer-input">
-          <input 
-            type="number" 
-            v-model="userAnswer" 
-            @keyup.enter="submitAnswer"
-            ref="answerInput"
-            min="0"
-            max="100"
-          >
-          <button @click="submitAnswer" :disabled="!userAnswer">确认</button>
+        <div class="answer-input-container">
+          <div class="answer-input">
+            <input 
+              type="number" 
+              v-model="userAnswer" 
+              @keyup.enter="submitAnswer"
+              ref="answerInput"
+              min="0"
+              max="100"
+              placeholder="输入数量"
+            >
+            <button @click="submitAnswer" :disabled="!userAnswer" class="submit-btn">确认</button>
+          </div>
+          
+          <div class="divider">
+           </div>
+          
+          <div class="show-answer-option">
+            <span class="hint-text">不确定？</span>
+            <button @click="showCorrectAnswer" class="show-answer-btn">显示答案</button>
+          </div>
         </div>
       </div>
 
       <!-- 结果显示 -->
       <div class="result-section" v-if="showResult">
-        <div class="result-card" :class="{ correct: isCorrect, incorrect: !isCorrect }">
-          <div class="result-icon">{{ isCorrect ? '✓' : '✗' }}</div>
-          <h3>{{ isCorrect ? '回答正确！' : '回答错误' }}</h3>
+        <div class="result-card" :class="{ 
+          correct: isCorrect === true, 
+          incorrect: isCorrect === false,
+          'show-answer': isCorrect === null 
+        }">
+          <div class="result-icon" v-if="isCorrect !== null">{{ isCorrect ? '✓' : '✗' }}</div>
+          <div class="result-icon" v-else>👁️</div>
+          
+          <h3 v-if="isCorrect === true">回答正确！</h3>
+          <h3 v-else-if="isCorrect === false">回答错误</h3>
+          <h3 v-else>正确答案</h3>
+          
           <p>正确答案：{{ dotCount }}</p>
-          <p>您的答案：{{ userAnswer }}</p>
-          <p v-if="!isCorrect">差值：{{ Math.abs(dotCount - userAnswer) }}</p>
+          <p v-if="userAnswer && isCorrect !== null">您的答案：{{ userAnswer }}</p>
+          <p v-if="isCorrect === false">差值：{{ Math.abs(dotCount - userAnswer) }}</p>
+          <p v-if="isCorrect === null" class="no-input-hint">您选择了查看答案，此轮不计入统计</p>
         </div>
         
         <div class="action-buttons">
@@ -333,6 +354,16 @@ const submitAnswer = () => {
   
   showResult.value = true
   saveStats()
+}
+
+// 显示正确答案（无输入模式）
+const showCorrectAnswer = () => {
+  // 不需要用户输入，直接显示正确答案
+  userAnswer.value = '' // 清空用户输入
+  isCorrect.value = null // 标记为查看答案模式，不计入正确/错误统计
+  
+  // 不更新统计数据，因为用户选择了查看答案
+  showResult.value = true
 }
 
 // 下一轮
@@ -601,45 +632,173 @@ onMounted(() => {
   margin-bottom: 1rem;
 }
 
-.answer-input {
+.answer-input-container {
   display: flex;
   justify-content: center;
-  gap: 1rem;
   align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.answer-input {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .answer-input input {
-  width: 120px;
-  padding: 0.8rem;
+  width: 140px;
+  padding: 0.8rem 1rem;
   border: 2px solid #bdc3c7;
   border-radius: 8px;
   font-size: 1.2rem;
   text-align: center;
+  transition: all 0.3s ease;
 }
 
 .answer-input input:focus {
   outline: none;
   border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
-.answer-input button {
-  padding: 0.8rem 2rem;
+.answer-input input::placeholder {
+  color: #95a5a6;
+  font-size: 1rem;
+}
+
+.submit-btn {
+  padding: 0.8rem 1.5rem;
   background: #27ae60;
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3);
 }
 
-.answer-input button:hover:not(:disabled) {
+.submit-btn:hover:not(:disabled) {
   background: #229954;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(39, 174, 96, 0.4);
 }
 
-.answer-input button:disabled {
+.submit-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(39, 174, 96, 0.2);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.divider::before {
+  content: '';
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, #bdc3c7, transparent);
+  margin-right: 1rem;
+}
+
+.divider::after {
+  content: '';
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, #bdc3c7, transparent);
+  margin-left: 1rem;
+}
+
+.divider-text {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: #f8f9fa;
+  padding: 0 0.5rem;
+}
+
+.show-answer-option {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.hint-text {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.show-answer-btn {
+  padding: 0.8rem 1.5rem;
+  background: #f39c12;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(243, 156, 18, 0.3);
+  white-space: nowrap;
+}
+
+.show-answer-btn:hover {
+  background: #e67e22;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(243, 156, 18, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .answer-input-container {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .divider::before,
+  .divider::after {
+    display: none;
+  }
+  
+  .divider {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .divider-text {
+    position: relative;
+  }
+  
+  .divider-text::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -50px;
+    right: -50px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #bdc3c7, transparent);
+    z-index: -1;
+  }
+  
+  .answer-input,
+  .show-answer-option {
+    justify-content: center;
+  }
 }
 
 .result-section {
@@ -660,6 +819,22 @@ onMounted(() => {
 
 .result-card.incorrect {
   border-left: 5px solid #e74c3c;
+}
+
+.result-card.show-answer {
+  border-left: 5px solid #f39c12;
+  background: linear-gradient(135deg, #fff9e6, #ffffff);
+}
+
+.result-card.show-answer .result-icon {
+  color: #f39c12;
+}
+
+.no-input-hint {
+  color: #f39c12;
+  font-style: italic;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
 }
 
 .result-icon {
