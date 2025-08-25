@@ -1,8 +1,8 @@
 <template>
   <div class="ultra-high-speed-flash-container">
     <div class="header">
-      <h2>超高速闪记训练</h2>
-      <p class="description">通过超高速闪记训练，提升数字感知和计算能力</p>
+      <h2>超高速自动处理训练</h2>
+      <p class="description">通过超高速自动处理训练，提升数字感知和计算能力</p>
     </div>
 
     <!-- 设置面板 -->
