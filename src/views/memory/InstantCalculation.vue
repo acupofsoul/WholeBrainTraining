@@ -1,7 +1,7 @@
 <template>
   <div class="instant-calculation-container">
     <div class="header">
-      <h2>瞬时计算</h2>
+      <h2>超高速自动处理</h2>
       <p>通过快速心算训练，提升数字处理和计算能力</p>
     </div>
 
@@ -50,7 +50,7 @@
         <div class="countdown-circle">
           <span class="countdown-number">{{ countdown }}</span>
         </div>
-        <p>请准备好进行超高速闪记</p>
+        <p>请准备好进行超高速自动处理</p>
       </div>
 
       <!-- 计算阶段 -->

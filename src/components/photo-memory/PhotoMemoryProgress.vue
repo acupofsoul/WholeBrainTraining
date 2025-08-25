@@ -274,7 +274,7 @@ const modules = [
   { key: 'threeDCard', name: '3D卡片', icon: '🃏' },
   { key: 'thousandImages', name: '千图训练', icon: '🖼️' },
   { key: 'memoryTraining', name: '记忆训练', icon: '🧠' },
-  { key: 'instantCalculation', name: '瞬时计算', icon: '🔢' }
+  { key: 'instantCalculation', name: '超高速自动处理', icon: '🔢' }
 ];
 
 // 计算属性

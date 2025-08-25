@@ -1,58 +1,62 @@
 <template>
   <div class="mindfulness-training-container">
-
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="header-background">
-        <div class="mindfulness-waves">
-          <div class="wave wave-1"></div>
-          <div class="wave wave-2"></div>
-          <div class="wave wave-3"></div>
-        </div>
-      </div>
-      <h1>🧘‍♀️ 正念训练</h1>
-      <p class="page-description">
-        培养孩子的当下觉察能力，提升情绪管理技能。
-        正念是一种专注于当下的能力，帮助孩子更好地理解自己的感受和想法。
-      </p>
-    </div>
-
-    <!-- 正念练习选择 -->
-    <div class="mindfulness-exercises">
-      <h2 class="section-title">选择正念练习</h2>
-      <div class="exercises-grid">
-        <div 
-          v-for="exercise in mindfulnessExercises" 
-          :key="exercise.id"
-          class="exercise-card"
-          :class="{ active: selectedExercise?.id === exercise.id }"
-          @click="selectExercise(exercise)"
-        >
-          <div class="exercise-icon">{{ exercise.icon }}</div>
-          <h3>{{ exercise.name }}</h3>
-          <p>{{ exercise.description }}</p>
-          <div class="exercise-benefits">
-            <span v-for="benefit in exercise.benefits" :key="benefit" class="benefit-tag">
-              {{ benefit }}
-            </span>
-          </div>
-          <div class="exercise-info">
-            <div class="info-row">
-              <span class="info-label">时长：</span>
-              <span class="info-value">{{ exercise.duration }}分钟</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">难度：</span>
-              <span class="info-value">{{ exercise.difficulty }}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">适合年龄：</span>
-              <span class="info-value">{{ exercise.ageRange }}</span>
-            </div>
+    <!-- 主页面内容 -->
+    <div v-if="$route.path === '/meditation/mindfulness'">
+      <!-- 页面头部 -->
+      <div class="page-header">
+        <div class="header-background">
+          <div class="mindfulness-waves">
+            <div class="wave wave-1"></div>
+            <div class="wave wave-2"></div>
+            <div class="wave wave-3"></div>
           </div>
         </div>
+        <h1>🧘‍♀️ 正念训练</h1>
+        <p class="page-description">
+          培养孩子的当下觉察能力，提升情绪管理技能。
+          正念是一种专注于当下的能力，帮助孩子更好地理解自己的感受和想法。
+        </p>
+      </div>
+
+      <!-- 正念练习选择 -->
+      <div class="mindfulness-exercises">
+        <h2 class="section-title">选择正念练习</h2>
+        <div class="exercises-grid">
+          <div 
+            v-for="exercise in mindfulnessExercises" 
+            :key="exercise.id"
+            class="exercise-card"
+            @click="navigateTo(exercise.path)"
+          >
+            <div class="exercise-icon">{{ exercise.icon }}</div>
+            <h3>{{ exercise.name }}</h3>
+            <p>{{ exercise.description }}</p>
+            <div class="exercise-benefits">
+              <span v-for="benefit in exercise.benefits" :key="benefit" class="benefit-tag">
+                {{ benefit }}
+              </span>
+            </div>
+            <div class="exercise-info">
+              <div class="info-row">
+                <span class="info-label">时长：</span>
+                <span class="info-value">{{ exercise.duration }}分钟</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">难度：</span>
+                <span class="info-value">{{ exercise.difficulty }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">适合年龄：</span>
+                <span class="info-value">{{ exercise.ageRange }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- 子路由内容 -->
+    <router-view v-else />
 
     <!-- 训练准备 -->
     <div v-if="selectedExercise && !isTraining" class="training-setup">
@@ -233,13 +237,36 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import MindfulnessMonitor from '@/components/meditation/MindfulnessMonitor.vue';
 import meditationStorage from '@/utils/meditationStorage.js';
+
+// 路由
+const router = useRouter();
+
+/**
+ * 导航到指定的正念练习页面
+ * @param {string} path - 练习页面路径
+ */
+const navigateTo = (path) => {
+  router.push(`/meditation/mindfulness/${path}`);
+};
 
 // 正念练习数据
 const mindfulnessExercises = ref([
   {
     id: 1,
+    name: '呼吸觉察',
+    icon: '🌬️',
+    description: '专注于呼吸的节奏，培养当下觉察能力',
+    duration: 5,
+    difficulty: '初级',
+    ageRange: '4-12岁',
+    benefits: ['专注力', '情绪调节', '放松身心'],
+    path: 'breathing-awareness'
+  },
+  {
+    id: 2,
     name: '身体扫描',
     icon: '🫂',
     description: '从头到脚感受身体的每个部位，培养身体觉察力',
@@ -247,6 +274,7 @@ const mindfulnessExercises = ref([
     difficulty: '初级',
     ageRange: '5-12岁',
     benefits: ['身体觉察', '放松肌肉', '专注训练'],
+    path: 'body-scan',
     overview: '通过有序地关注身体各个部位，学会觉察身体的感受和状态。',
     instructions: [
       '找一个舒适的姿势躺下或坐着',
@@ -290,14 +318,15 @@ const mindfulnessExercises = ref([
     ]
   },
   {
-    id: 2,
-    name: '情绪观察',
+    id: 3,
+    name: '情绪觉察',
     icon: '💭',
     description: '学会观察和接纳自己的情绪，不被情绪控制',
     duration: 6,
     difficulty: '中级',
     ageRange: '7-12岁',
     benefits: ['情绪管理', '自我认知', '心理平衡'],
+    path: 'emotion-awareness',
     overview: '通过观察内心的情绪变化，学会以平和的心态面对各种感受。',
     instructions: [
       '坐在舒适的位置，闭上眼睛',
@@ -335,49 +364,26 @@ const mindfulnessExercises = ref([
     ]
   },
   {
-    id: 3,
-    name: '声音冥想',
-    icon: '👂',
-    description: '专注于周围的声音，训练听觉专注力',
-    duration: 5,
+    id: 4,
+    name: '正念行走',
+    icon: '🚶‍♀️',
+    description: '在行走中保持觉察，感受每一步的体验',
+    duration: 10,
+    difficulty: '中级',
+    ageRange: '6-12岁',
+    benefits: ['身体协调', '动态觉察', '专注训练'],
+    path: 'mindful-walking'
+  },
+  {
+    id: 5,
+    name: '感恩练习',
+    icon: '🙏',
+    description: '培养感恩的心态，增强积极情绪',
+    duration: 7,
     difficulty: '初级',
-    ageRange: '4-12岁',
-    benefits: ['听觉专注', '环境觉察', '当下意识'],
-    overview: '通过专注于各种声音，培养对当下环境的敏锐觉察力。',
-    instructions: [
-      '找一个安静的地方坐下',
-      '闭上眼睛，仔细聆听',
-      '注意远处和近处的各种声音',
-      '不要分析声音，只是听',
-      '当思维游走时，回到声音上'
-    ],
-    posture: '舒适地坐着，保持警觉但放松的状态',
-    phases: [
-      {
-        title: '声音觉察',
-        guidance: '闭上眼睛，仔细听听周围有什么声音',
-        focusIcon: '👂',
-        duration: 60
-      },
-      {
-        title: '远近声音',
-        guidance: '分别注意远处和近处的声音，不要偏爱任何一种',
-        focusIcon: '🔊',
-        duration: 120
-      },
-      {
-        title: '声音层次',
-        guidance: '听听声音的层次，有些大声，有些轻柔',
-        focusIcon: '🎵',
-        duration: 120
-      },
-      {
-        title: '声音空间',
-        guidance: '感受声音在空间中的位置和移动',
-        focusIcon: '🌐',
-        duration: 60
-      }
-    ]
+    ageRange: '5-12岁',
+    benefits: ['积极情绪', '感恩心态', '幸福感'],
+    path: 'gratitude-practice'
   }
 ]);
 

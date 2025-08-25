@@ -618,7 +618,7 @@ export default {
       const types = ['circle', 'square', 'triangle']
       const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57']
       
-      for (let i = 0; i < settings.value.elementCount; i++) {
+      for (let i = 0; i < (settings.value.elementCount || settings.value.stimulusCount || 8); i++) {
         shapes.push({
           type: types[Math.floor(Math.random() * types.length)],
           color: colors[Math.floor(Math.random() * colors.length)],
@@ -632,7 +632,7 @@ export default {
 
     const generateNumbers = () => {
       const numbers = []
-      for (let i = 0; i < settings.value.elementCount; i++) {
+      for (let i = 0; i < (settings.value.elementCount || settings.value.stimulusCount || 8); i++) {
         numbers.push(Math.floor(Math.random() * 100))
       }
       currentNumbers.value = numbers
@@ -660,7 +660,7 @@ export default {
       const colors = [baseColor]
       
       // 生成相似颜色
-      for (let i = 1; i < settings.value.elementCount; i++) {
+      for (let i = 1; i < (settings.value.elementCount || settings.value.stimulusCount || 8); i++) {
         colors.push(baseColor)
       }
       

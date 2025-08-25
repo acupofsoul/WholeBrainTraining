@@ -1,8 +1,8 @@
 <template>
   <div class="instant-calculation">
     <div class="training-header">
-      <h2>瞬间计算</h2>
-      <p>超高速闪记数字，提升数学直觉</p>
+      <h2>超高速自动处理</h2>
+      <p>超高速自动处理数字，提升数学直觉</p>
     </div>
 
     <div class="training-content">

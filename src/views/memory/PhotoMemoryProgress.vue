@@ -218,7 +218,7 @@ const moduleProgress = ref([
   },
   {
     id: 'instant-calculation',
-    name: '瞬时计算',
+    name: '超高速自动处理',
     level: '专家',
     progress: 95,
     sessions: 19,
@@ -232,7 +232,7 @@ const recentSessions = ref([
   {
     id: 1,
     date: new Date('2024-01-15'),
-    module: '瞬时计算',
+    module: '超高速自动处理',
     duration: 420,
     accuracy: 92,
     score: 2350,

@@ -77,8 +77,8 @@
 
       <div class="module-card" @click="navigateTo('instant-calculation')">
         <div class="module-icon">🔢</div>
-        <h3>瞬时计算</h3>
-        <p>结合视觉记忆的超高速闪记训练，提升数字处理和运算能力</p>
+        <h3>超高速自动处理</h3>
+        <p>结合视觉记忆的超高速自动处理训练，提升数字处理和运算能力</p>
         <div class="module-level">难度：⭐⭐⭐⭐</div>
         <div class="module-stats">
           <span>计算速度：{{ calcStats.speed }}题/分</span>
@@ -180,7 +180,7 @@
           <p>掌握大量图像记忆技巧</p>
           <div class="level-requirements">
             <span>✓ 1000图训练 100张</span>
-            <span>✓ 瞬时计算 20题/分</span>
+            <span>✓ 超高速自动处理 20题/分</span>
           </div>
         </div>
         
@@ -266,7 +266,7 @@ const moduleTitles = {
   '/photographic-memory/3d-cards': '3D卡片训练',
   '/photographic-memory/thousand-images': '1000图训练',
   '/photographic-memory/memory-training': '记忆训练',
-  '/photographic-memory/instant-calculation': '瞬时计算',
+  '/photographic-memory/instant-calculation': '超高速自动处理',
 
   '/photographic-memory/progress': '训练进度分析'
 };
@@ -278,7 +278,7 @@ const siblingModules = [
   { path: '/photographic-memory/3d-cards', title: '3D卡片训练' },
   { path: '/photographic-memory/thousand-images', title: '1000图训练' },
   { path: '/photographic-memory/memory-training', title: '记忆训练' },
-  { path: '/photographic-memory/instant-calculation', title: '瞬时计算' },
+  { path: '/photographic-memory/instant-calculation', title: '超高速自动处理' },
 
   { path: '/photographic-memory/progress', title: '训练进度分析' }
 ];

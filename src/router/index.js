@@ -116,7 +116,34 @@ const routes = [
       {
         path: 'mindfulness',
         name: 'MindfulnessTraining',
-        component: () => import('../views/meditation/MindfulnessTraining.vue')
+        component: () => import('../views/meditation/MindfulnessTraining.vue'),
+        children: [
+          {
+            path: 'breathing-awareness',
+            name: 'BreathingAwareness',
+            component: () => import('../views/meditation/mindfulness/BreathingAwareness.vue')
+          },
+          {
+            path: 'body-scan',
+            name: 'BodyScan',
+            component: () => import('../views/meditation/mindfulness/BodyScan.vue')
+          },
+          {
+            path: 'emotion-awareness',
+            name: 'EmotionAwareness',
+            component: () => import('../views/meditation/mindfulness/EmotionAwareness.vue')
+          },
+          {
+            path: 'mindful-walking',
+            name: 'MindfulWalking',
+            component: () => import('../views/meditation/mindfulness/MindfulWalking.vue')
+          },
+          {
+            path: 'gratitude-practice',
+            name: 'GratitudePractice',
+            component: () => import('../views/meditation/mindfulness/GratitudePractice.vue')
+          }
+        ]
       }
     ]
   },
@@ -250,7 +277,6 @@ const routes = [
         name: 'InstantCalculation',
         component: () => import('../views/memory/InstantCalculation.vue')
       },
-  
       {
         path: 'progress',
         name: 'PhotoMemoryProgress',

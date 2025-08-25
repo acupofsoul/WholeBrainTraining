@@ -38,7 +38,7 @@
             <router-link to="/basic-training/fluency" class="dropdown-item">流畅性训练</router-link>
             <router-link to="/basic-training/attention" class="dropdown-item">注意力训练</router-link>
             <router-link to="/basic-training/schulte" class="dropdown-item">舒尔特表</router-link>
-            <router-link to="/basic-training/ultra-high-speed-flash" class="dropdown-item">超高速闪记</router-link>
+            <router-link to="/basic-training/ultra-high-speed-flash" class="dropdown-item">超高速自动处理</router-link>
           </div>
         </div>
         
@@ -72,7 +72,7 @@
             <router-link to="/photographic-memory/3d-cards" class="dropdown-item">3D卡片</router-link>
             <router-link to="/photographic-memory/thousand-images" class="dropdown-item">1000图训练</router-link>
             <router-link to="/photographic-memory/memory-training" class="dropdown-item">记忆训练</router-link>
-            <router-link to="/photographic-memory/instant-calculation" class="dropdown-item">瞬时计算</router-link>
+            <router-link to="/photographic-memory/instant-calculation" class="dropdown-item">超高速自动处理</router-link>
             
             <router-link to="/photographic-memory/progress" class="dropdown-item">训练进度分析</router-link>
           </div>
